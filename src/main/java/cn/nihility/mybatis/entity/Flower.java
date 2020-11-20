@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Flower {
 
-    private Integer id;
+    private String id;
     private String nameEnglish;
     private String nameChinese;
     private Integer age;
@@ -20,11 +20,18 @@ public class Flower {
         this.age = age;
     }
 
-    public Integer getId() {
+  public Flower(String id, String nameEnglish, String nameChinese, Integer age) {
+    this.id = id;
+    this.nameEnglish = nameEnglish;
+    this.nameChinese = nameChinese;
+    this.age = age;
+  }
+
+  public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

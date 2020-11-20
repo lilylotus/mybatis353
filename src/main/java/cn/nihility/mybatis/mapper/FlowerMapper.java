@@ -6,12 +6,14 @@ import java.util.List;
 
 public interface FlowerMapper {
 
-    Flower searchById(Integer id);
+    Flower searchById(String id);
 
     List<Flower> searchAll();
 
-    Integer updateByEntity(Flower garden);
+    Integer insertByEntity(Flower flower);
 
-    Integer deleteById(Integer id);
+    Integer updateByEntity(Flower flower);
+
+    Integer deleteById(String id);
 
 }
