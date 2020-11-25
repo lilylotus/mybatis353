@@ -22,7 +22,7 @@ public class MybatisStarter {
         InputStream inputStream = Resources.getResourceAsStream(mybatisConfigLocation);
         SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 
-        try (SqlSession session = sessionFactory.openSession(false)) {
+        try (SqlSession session = sessionFactory.openSession()) {
             FlowerMapper mapper = session.getMapper(FlowerMapper.class);
             FlowerMapper2 mapper2 = session.getMapper(FlowerMapper2.class);
 

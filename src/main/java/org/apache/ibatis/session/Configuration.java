@@ -602,16 +602,22 @@ public class Configuration {
     executorType = executorType == null ? defaultExecutorType : executorType;
     executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
     Executor executor;
+    // 依据执行器的类型初始化 SQL 执行器
+    // 批量 SQL 执行
     if (ExecutorType.BATCH == executorType) {
       executor = new BatchExecutor(this, transaction);
+      // 可重用的 SQL 执行器
     } else if (ExecutorType.REUSE == executorType) {
       executor = new ReuseExecutor(this, transaction);
     } else {
+      // 简单 SQL 执行器
       executor = new SimpleExecutor(this, transaction);
     }
+    // 是否允许缓存，一级缓存 ???
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
+    // 拦截器链，添加 JDK 动态代理插件
     executor = (Executor) interceptorChain.pluginAll(executor);
     return executor;
   }

@@ -1,6 +1,7 @@
 DROP DATABASE IF EXISTS `mybatis`;
 CREATE DATABASE `mybatis` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
+USE mybatis;
 
 DROP TABLE IF EXISTS flower;
 CREATE TABLE flower (
