@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="cn.nihility.mybatis.mapper.FlowerMapper">
+<mapper namespace="cn.nihility.mybatis.mapper.FlowerMapper2">
 
     <select id="searchById" resultType="flower" parameterType="string">
         SELECT id, name_english, name_chinese, age, add_time, update_time

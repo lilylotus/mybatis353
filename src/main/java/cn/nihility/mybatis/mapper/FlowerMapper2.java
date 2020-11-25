@@ -4,7 +4,7 @@ import cn.nihility.mybatis.entity.Flower;
 
 import java.util.List;
 
-public interface FlowerMapper {
+public interface FlowerMapper2 {
 
     Flower searchById(String id);
 

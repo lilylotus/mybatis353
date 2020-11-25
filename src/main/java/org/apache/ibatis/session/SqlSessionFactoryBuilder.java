@@ -74,6 +74,7 @@ public class SqlSessionFactoryBuilder {
 
   public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
     try {
+      // 解析 mybatis-config.xml 配置
       XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
       return build(parser.parse());
     } catch (Exception e) {

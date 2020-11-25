@@ -95,27 +95,40 @@ public class XMLConfigBuilder extends BaseBuilder {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
     parsed = true;
+    // 解析 configuration 节点下的所有元素
     parseConfiguration(parser.evalNode("/configuration"));
+    // 返回解析好的 mybatis 配置类，配置元数据集合
     return configuration;
   }
 
   private void parseConfiguration(XNode root) {
     try {
+      // 添加外部配置的属性变量配置
       //issue #117 read properties first
       propertiesElement(root.evalNode("properties"));
+      // mybatis 行为配置解析， 如：使用驼峰命名解析 sql 字段
+      // <setting name="mapUnderscoreToCamelCase" value="true"/>
       Properties settings = settingsAsProperties(root.evalNode("settings"));
+      // mybatis - vfsImpl 的增强
       loadCustomVfs(settings);
+      // 加载自定义日志配置
       loadCustomLogImpl(settings);
+      // org.apache.ibatis.type.TypeAliasRegistry.typeAliases 类型别名
+      // 添加自定义类型别名配置
       typeAliasesElement(root.evalNode("typeAliases"));
+      // 添加自定义插件配置
       pluginElement(root.evalNode("plugins"));
       objectFactoryElement(root.evalNode("objectFactory"));
       objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
       reflectorFactoryElement(root.evalNode("reflectorFactory"));
+      // 设置 mybatis configuration 配置属性
       settingsElement(settings);
+      // 读取数据库连接环境配置
       // read it after objectFactory and objectWrapperFactory issue #631
       environmentsElement(root.evalNode("environments"));
       databaseIdProviderElement(root.evalNode("databaseIdProvider"));
       typeHandlerElement(root.evalNode("typeHandlers"));
+      // 解析具体的 mapper 配置
       mapperElement(root.evalNode("mappers"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
@@ -130,6 +143,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     // Check that all settings are known to the configuration class
     MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
     for (Object key : props.keySet()) {
+      // 判断所配置的数据是否是 mybatis 定义的配置 key，防止错误配置
       if (!metaConfig.hasSetter(String.valueOf(key))) {
         throw new BuilderException("The setting " + key + " is not known.  Make sure you spelled it correctly (case sensitive).");
       }
@@ -158,9 +172,13 @@ public class XMLConfigBuilder extends BaseBuilder {
 
   private void typeAliasesElement(XNode parent) {
     if (parent != null) {
+      /*
+      * typeAlias 节点中可配置 package 或者直接自定义指定类型别名
+      * */
       for (XNode child : parent.getChildren()) {
         if ("package".equals(child.getName())) {
           String typeAliasPackage = child.getStringAttribute("name");
+          // 把该 package 下及其子包的所有实体类的名称作为类型别名
           configuration.getTypeAliasRegistry().registerAliases(typeAliasPackage);
         } else {
           String alias = child.getStringAttribute("alias");
@@ -226,11 +244,15 @@ public class XMLConfigBuilder extends BaseBuilder {
       if (resource != null && url != null) {
         throw new BuilderException("The properties element cannot specify both a URL and a resource based property file reference.  Please specify one or the other.");
       }
+      /*
+      * <properties> 节点有属性 resource 和 url，但仅会按照优先级 resource > url 加载其中一个
+      * */
       if (resource != null) {
         defaults.putAll(Resources.getResourceAsProperties(resource));
       } else if (url != null) {
         defaults.putAll(Resources.getUrlAsProperties(url));
       }
+      // 整合外部加载自定义配置变量和 configuration 自带变量
       Properties vars = configuration.getVariables();
       if (vars != null) {
         defaults.putAll(vars);
@@ -367,16 +389,19 @@ public class XMLConfigBuilder extends BaseBuilder {
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
           String mapperClass = child.getStringAttribute("class");
+          // 解析 resource
           if (resource != null && url == null && mapperClass == null) {
             ErrorContext.instance().resource(resource);
             InputStream inputStream = Resources.getResourceAsStream(resource);
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
             mapperParser.parse();
+            // 解析 url
           } else if (resource == null && url != null && mapperClass == null) {
             ErrorContext.instance().resource(url);
             InputStream inputStream = Resources.getUrlAsStream(url);
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
             mapperParser.parse();
+            // 解析 class
           } else if (resource == null && url == null && mapperClass != null) {
             Class<?> mapperInterface = Resources.classForName(mapperClass);
             configuration.addMapper(mapperInterface);

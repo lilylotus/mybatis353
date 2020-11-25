@@ -2,6 +2,7 @@ package cn.nihility.mybatis;
 
 import cn.nihility.mybatis.entity.Flower;
 import cn.nihility.mybatis.mapper.FlowerMapper;
+import cn.nihility.mybatis.mapper.FlowerMapper2;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class MybatisStarter {
 
-    private static final String FLOWER_ID = "000005";
+    private static final String FLOWER_ID = "000008";
 
     public static void main(String[] args) throws IOException {
         String mybatisConfigLocation = "mybatis/mybatis-config.xml";
@@ -23,6 +24,7 @@ public class MybatisStarter {
 
         try (SqlSession session = sessionFactory.openSession(false)) {
             FlowerMapper mapper = session.getMapper(FlowerMapper.class);
+            FlowerMapper2 mapper2 = session.getMapper(FlowerMapper2.class);
 
             List<Flower> gardenItemList = mapper.searchAll();
             System.out.println(gardenItemList);
@@ -30,15 +32,21 @@ public class MybatisStarter {
             System.out.println("-------------------------------");
             mapper.insertByEntity(generateFlower());
             session.commit();
-            System.out.println(mapper.searchById(FLOWER_ID));
+            System.out.println(mapper2.searchById(FLOWER_ID));
 
             System.out.println("-------------------------------");
             mapper.updateByEntity(generateUpdateFlower());
             session.commit();
             System.out.println(mapper.searchById(FLOWER_ID));
 
+          System.out.println("-------------------------------");
+          mapper.updateNameById(FLOWER_ID, "测试修改");
+          session.commit();
+          System.out.println(mapper.searchById(FLOWER_ID));
+
             System.out.println("-------------------------------");
             System.out.println(mapper.deleteById(FLOWER_ID));
+            session.commit();
             System.out.println(mapper.searchById(FLOWER_ID));
 
         }

@@ -90,9 +90,17 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+    // configuration 中是否存在该配置资源
     if (!configuration.isResourceLoaded(resource)) {
+      // 解析 mapper 节点下元数据
       configurationElement(parser.evalNode("/mapper"));
+      // 解析完成后的资源添加到资源集合
       configuration.addLoadedResource(resource);
+      /*
+      添加此处 mapper 的 namespace，创建 MapperProxyFactory 接口 mapper 代理工厂
+      key : namespace 接口 class, value : MapperProxyFactory
+      configuration 添加解析完成后的 namespace 到 loadedResources
+      */
       bindMapperForNamespace();
     }
 
@@ -107,6 +115,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void configurationElement(XNode context) {
     try {
+      // namespace 不可为空
       String namespace = context.getStringAttribute("namespace");
       if (namespace == null || namespace.equals("")) {
         throw new BuilderException("Mapper's namespace cannot be empty");
@@ -115,8 +124,11 @@ public class XMLMapperBuilder extends BaseBuilder {
       cacheRefElement(context.evalNode("cache-ref"));
       cacheElement(context.evalNode("cache"));
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
+      // 构建 resultMap 集
       resultMapElements(context.evalNodes("/mapper/resultMap"));
+      // 添加常量 sql 语句
       sqlElement(context.evalNodes("/mapper/sql"));
+      // 构建要执行的 DML 语句
       buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
@@ -127,11 +139,13 @@ public class XMLMapperBuilder extends BaseBuilder {
     if (configuration.getDatabaseId() != null) {
       buildStatementFromContext(list, configuration.getDatabaseId());
     }
+    // list 保存的是 select|insert|update|delete DML 语句 (Statement)
     buildStatementFromContext(list, null);
   }
 
   private void buildStatementFromContext(List<XNode> list, String requiredDatabaseId) {
     for (XNode context : list) {
+      // context 是 select|insert|update|delete DML 语句中的一种
       final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, requiredDatabaseId);
       try {
         statementParser.parseStatementNode();

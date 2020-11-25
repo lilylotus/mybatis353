@@ -3,7 +3,7 @@
 <configuration>
 
     <properties resource="mybatis/mysql.properties"/>
-    
+
     <settings>
         <setting name="cacheEnabled" value="true"/>
         <setting name="lazyLoadingEnabled" value="true"/>
@@ -30,6 +30,7 @@
 
     <mappers>
         <mapper resource="mybatis/mapper/FlowerMapper.xml"/>
+        <mapper resource="mybatis/mapper/FlowerMapper2.xml"/>
     </mappers>
 
 </configuration>
