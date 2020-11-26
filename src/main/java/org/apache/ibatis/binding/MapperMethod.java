@@ -50,7 +50,9 @@ public class MapperMethod {
   private final MethodSignature method;
 
   public MapperMethod(Class<?> mapperInterface, Method method, Configuration config) {
+    // 生成一个 JDBC 的 Statement 执行 SQL 对象
     this.command = new SqlCommand(config, mapperInterface, method);
+    // 解析方法参数，返回值等信息
     this.method = new MethodSignature(config, mapperInterface, method);
   }
 
@@ -76,8 +78,10 @@ public class MapperMethod {
         if (method.returnsVoid() && method.hasResultHandler()) {
           executeWithResultHandler(sqlSession, args);
           result = null;
+          // List/Set 返回类型
         } else if (method.returnsMany()) {
           result = executeForMany(sqlSession, args);
+          // Map 返回类型
         } else if (method.returnsMap()) {
           result = executeForMap(sqlSession, args);
         } else if (method.returnsCursor()) {
@@ -139,11 +143,13 @@ public class MapperMethod {
 
   private <E> Object executeForMany(SqlSession sqlSession, Object[] args) {
     List<E> result;
+    // 把传入的实参值和对应的参数 index 绑定起来，形成一个 arg:value map
     Object param = method.convertArgsToSqlCommandParam(args);
     if (method.hasRowBounds()) {
       RowBounds rowBounds = method.extractRowBounds(args);
       result = sqlSession.selectList(command.getName(), param, rowBounds);
     } else {
+      // command.getName() -> namespace.id
       result = sqlSession.selectList(command.getName(), param);
     }
     // issue #510 Collections & arrays support
@@ -254,6 +260,7 @@ public class MapperMethod {
     private MappedStatement resolveMappedStatement(Class<?> mapperInterface, String methodName,
         Class<?> declaringClass, Configuration configuration) {
       String statementId = mapperInterface.getName() + "." + methodName;
+      // 把 Configuration 解析好的 Statement 对象拿出来
       if (configuration.hasStatement(statementId)) {
         return configuration.getMappedStatement(statementId);
       } else if (mapperInterface.equals(declaringClass)) {
@@ -294,14 +301,21 @@ public class MapperMethod {
       } else {
         this.returnType = method.getReturnType();
       }
+      // 依据返回值类型 returnType 决定在具体执行时所采用的方式方法
       this.returnsVoid = void.class.equals(this.returnType);
       this.returnsMany = configuration.getObjectFactory().isCollection(this.returnType) || this.returnType.isArray();
       this.returnsCursor = Cursor.class.equals(this.returnType);
       this.returnsOptional = Optional.class.equals(this.returnType);
       this.mapKey = getMapKey(method);
       this.returnsMap = this.mapKey != null;
+      /* 暂时理解为获取查询数据的范围
+      * 默认 org.apache.ibatis.session.RowBounds.DEFAULT
+      * 没有行偏移： 0， 无行限定： Integer.MAX_VALUE
+      * */
       this.rowBoundsIndex = getUniqueParamIndex(method, RowBounds.class);
+      // 是否有注解自定义的返回值处理器
       this.resultHandlerIndex = getUniqueParamIndex(method, ResultHandler.class);
+      // 实例初始化该方法对应的参数列表信息
       this.paramNameResolver = new ParamNameResolver(configuration, method);
     }
 

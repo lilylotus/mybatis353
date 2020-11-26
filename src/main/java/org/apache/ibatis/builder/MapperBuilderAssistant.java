@@ -267,6 +267,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
       throw new IncompleteElementException("Cache-ref not yet resolved");
     }
 
+    // currentNamespace + "." + base, 变为了 namespace (mapper 全限定名).id (mapper 接口方法)
     id = applyCurrentNamespace(id, false);
     boolean isSelect = sqlCommandType == SqlCommandType.SELECT;
 
@@ -294,6 +295,10 @@ public class MapperBuilderAssistant extends BaseBuilder {
     }
 
     MappedStatement statement = statementBuilder.build();
+    /* 把配置好的 mapper.xml SQL 配置段 / mapper 对应接口 的方法，作为一个 SQL Statement 添加到 Configuration
+    * 后面： org.apache.ibatis.binding.MapperMethod.SqlCommand.resolveMappedStatement
+    * 拿出该 statement 对象
+    * */
     configuration.addMappedStatement(statement);
     return statement;
   }

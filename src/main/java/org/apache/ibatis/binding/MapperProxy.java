@@ -89,11 +89,14 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);
     }
+    // 缓存执行方法
     final MapperMethod mapperMethod = cachedMapperMethod(method);
+    // 执行 SQL 方法， 具体的 SQL 执行逻辑， args 传递过来的方法实参
     return mapperMethod.execute(sqlSession, args);
   }
 
   private MapperMethod cachedMapperMethod(Method method) {
+    // 缓存不存在就新建 MapperMethod 执行实例
     return methodCache.computeIfAbsent(method,
         k -> new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
   }

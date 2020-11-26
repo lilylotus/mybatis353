@@ -64,11 +64,14 @@ public class MapperRegistry {
       }
       boolean loadCompleted = false;
       try {
+        // 对应 mapper 接口的代理工厂类，为后面 sqlSession.getMapper(class) 做准备
+        // mapper.xml 中 namespace 对应的接口对象
         knownMappers.put(type, new MapperProxyFactory<>(type));
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
+        // 加载对应 mapper 接口的 mybatis 注解
         parser.parse();
         loadCompleted = true;
       } finally {

@@ -40,10 +40,15 @@ public class MetaObject {
 
   private MetaObject(Object object, ObjectFactory objectFactory, ObjectWrapperFactory objectWrapperFactory, ReflectorFactory reflectorFactory) {
     this.originalObject = object;
+    // new DefaultObjectFactory();
     this.objectFactory = objectFactory;
+    // new DefaultObjectWrapperFactory()
     this.objectWrapperFactory = objectWrapperFactory;
+    // new DefaultReflectorFactory()
     this.reflectorFactory = reflectorFactory;
 
+    // 通过 ObjectWrapper 类解析对象元数据，字段/方法 ...
+    // 实现了 ObjectWrapper 接口
     if (object instanceof ObjectWrapper) {
       this.objectWrapper = (ObjectWrapper) object;
     } else if (objectWrapperFactory.hasWrapperFor(object)) {

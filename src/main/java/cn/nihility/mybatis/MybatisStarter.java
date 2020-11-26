@@ -39,10 +39,10 @@ public class MybatisStarter {
             session.commit();
             System.out.println(mapper.searchById(FLOWER_ID));
 
-          System.out.println("-------------------------------");
-          mapper.updateNameById(FLOWER_ID, "测试修改");
-          session.commit();
-          System.out.println(mapper.searchById(FLOWER_ID));
+            System.out.println("-------------------------------");
+            mapper.updateNameById(FLOWER_ID, "测试修改");
+            session.commit();
+            System.out.println(mapper.searchById(FLOWER_ID));
 
             System.out.println("-------------------------------");
             System.out.println(mapper.deleteById(FLOWER_ID));

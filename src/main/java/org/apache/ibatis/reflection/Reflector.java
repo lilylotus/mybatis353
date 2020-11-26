@@ -62,9 +62,13 @@ public class Reflector {
 
   public Reflector(Class<?> clazz) {
     type = clazz;
+    // 默认的构造函数
     addDefaultConstructor(clazz);
+    // 解析 get 方法和其返回值类型 Class, getTypes -> key: fieldName, value: returnType
     addGetMethods(clazz);
+    // 解析 set 方法和其参数，参数类型应该和相同 set 的返回类型一致，setTypes -> key: fieldName, value: paramType[0]
     addSetMethods(clazz);
+    // 解析对象属性
     addFields(clazz);
     readablePropertyNames = getMethods.keySet().toArray(new String[0]);
     writablePropertyNames = setMethods.keySet().toArray(new String[0]);
@@ -77,7 +81,9 @@ public class Reflector {
   }
 
   private void addDefaultConstructor(Class<?> clazz) {
+    // 获取所有的构造函数
     Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+    // 过滤默认构造函数
     Arrays.stream(constructors).filter(constructor -> constructor.getParameterTypes().length == 0)
       .findAny().ifPresent(constructor -> this.defaultConstructor = constructor);
   }
@@ -87,6 +93,7 @@ public class Reflector {
     Method[] methods = getClassMethods(clazz);
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
+    // 解决 get 方法冲突
     resolveGetterConflicts(conflictingGetters);
   }
 
@@ -135,9 +142,12 @@ public class Reflector {
 
   private void addSetMethods(Class<?> clazz) {
     Map<String, List<Method>> conflictingSetters = new HashMap<>();
+    // 获取该对象及其所有超类中的方法
     Method[] methods = getClassMethods(clazz);
+    // 过滤出所有 set 方法，相同名称的 method 添加到 List
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 1 && PropertyNamer.isSetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingSetters, PropertyNamer.methodToProperty(m.getName()), m));
+    // 解决 set 方法冲突
     resolveSetterConflicts(conflictingSetters);
   }
 
@@ -237,6 +247,7 @@ public class Reflector {
         addGetField(field);
       }
     }
+    // 递归解析其超类的属性
     if (clazz.getSuperclass() != null) {
       addFields(clazz.getSuperclass());
     }

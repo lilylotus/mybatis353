@@ -303,7 +303,10 @@ public class XMLConfigBuilder extends BaseBuilder {
         String id = child.getStringAttribute("id");
         // 是否是配置的默认 db ID
         if (isSpecifiedEnvironment(id)) {
+          // 默认 JDBC -> org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory
+          // 该 JdbcTransactionFactory 自带 PooledDataSource 数据库池
           TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+          // 默认 POOLED -> org.apache.ibatis.datasource.pooled.PooledDataSourceFactory
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
           DataSource dataSource = dsFactory.getDataSource();
           Environment.Builder environmentBuilder = new Environment.Builder(id)

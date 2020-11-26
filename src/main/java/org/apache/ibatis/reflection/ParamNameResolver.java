@@ -71,6 +71,7 @@ public class ParamNameResolver {
       if (name == null) {
         // @Param was not specified.
         if (config.isUseActualParamName()) {
+          // arg0, arg1 ...
           name = getActualParamName(method, paramIndex);
         }
         if (name == null) {
@@ -108,18 +109,24 @@ public class ParamNameResolver {
    * </p>
    */
   public Object getNamedParams(Object[] args) {
+    /* names 实在初始化 ParamNameResolver 时已经解析完成, {0:arg0,1:arg1 ... }
+    * Executable 对应一个 mapper 方法也是一个 SQL mapper.xml 语句段 statement
+    * args -> 执行方法传递过来的实参
+    * */
     final int paramCount = names.size();
     if (args == null || paramCount == 0) {
       return null;
+      // 仅有一个参数，且没有 @Param 自定义参数名称注解
     } else if (!hasParamAnnotation && paramCount == 1) {
       return args[names.firstKey()];
     } else {
       final Map<String, Object> param = new ParamMap<>();
       int i = 0;
       for (Map.Entry<Integer, String> entry : names.entrySet()) {
+        // {0:arg0} -> index:parameterName (JDK 默认的参数名称)
         param.put(entry.getValue(), args[entry.getKey()]);
         // add generic param names (param1, param2, ...)
-        final String genericParamName = GENERIC_NAME_PREFIX + String.valueOf(i + 1);
+        final String genericParamName = GENERIC_NAME_PREFIX + (i + 1);
         // ensure not to overwrite parameter named with @Param
         if (!names.containsValue(genericParamName)) {
           param.put(genericParamName, args[entry.getKey()]);
