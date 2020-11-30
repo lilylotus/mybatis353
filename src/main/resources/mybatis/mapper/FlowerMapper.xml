@@ -3,41 +3,66 @@
 
 <mapper namespace="cn.nihility.mybatis.mapper.FlowerMapper">
 
-    <select id="searchById" resultType="flower" parameterType="string">
-        SELECT id, name_english, name_chinese, age, add_time, update_time
-        FROM flower
-        WHERE id = #{id}
-    </select>
+  <select id="searchById" resultType="flower" parameterType="string">
+    SELECT id, name_english, name_chinese, age, add_time, update_time
+    FROM flower
+    WHERE id = #{id}
+  </select>
 
-    <select id="searchAll" resultType="flower">
-        SELECT id, name_english, name_chinese, age, add_time, update_time
-        FROM flower
-    </select>
+  <select id="searchByIdAsMap" resultType="map" parameterType="string">
+    SELECT id, name_english, name_chinese, age, add_time, update_time
+    FROM flower
+    WHERE id = #{id}
+  </select>
+
+  <select id="searchAll" resultType="flower">
+    SELECT id, name_english, name_chinese, age, add_time, update_time
+    FROM flower
+  </select>
+
+  <select id="searchAllAsMap" resultType="map">
+    SELECT id, name_english, name_chinese, age, add_time, update_time
+    FROM flower
+  </select>
 
   <insert id="insertByEntity" parameterType="flower">
     INSERT INTO flower (id, name_english, name_chinese, age, add_time, update_time)
     VALUES (#{id}, #{nameEnglish}, #{nameChinese}, #{age}, now(), now())
   </insert>
 
-    <update id="updateByEntity" parameterType="flower">
-        UPDATE flower
-        <set>
-          <if test="nameEnglish != null">name_english=#{nameEnglish},</if>
-          <if test="nameChinese != null">name_chinese=#{nameChinese},</if>
-          <if test="age != null">age=#{age},</if>
-          update_time = now()
-        </set>
-        WHERE id = #{id}
-    </update>
+  <update id="updateByEntity" parameterType="flower">
+    UPDATE flower
+    <set>
+      <if test="nameEnglish != null">name_english=#{nameEnglish},</if>
+      <if test="nameChinese != null">name_chinese=#{nameChinese},</if>
+      <if test="age != null">age=#{age},</if>
+      update_time = now()
+    </set>
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateColumnById">
+    UPDATE flower
+    SET ${field} = #{param3}, update_time = now()
+    WHERE id = #{param1}
+<choose>
+  <when test="arg != null"> statement </when>
+  <when test="arg1 != null"> statement1 </when>
+  <otherwise> otherwise_statement </otherwise>
+</choose>
+  </update>
 
   <update id="updateNameById">
     UPDATE flower
-    SET name_chinese = #{param2}, update_time = now()
+    SET name_chinese = #{param2},
+        update_time  = now()
     WHERE id = #{param1}
   </update>
 
-    <delete id="deleteById" parameterType="string">
-        DELETE FROM flower WHERE id = #{id}
-    </delete>
+  <delete id="deleteById" parameterType="string">
+    DELETE
+    FROM flower
+    WHERE id = #{id}
+  </delete>
 
 </mapper>

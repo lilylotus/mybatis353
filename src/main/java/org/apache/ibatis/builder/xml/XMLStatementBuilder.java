@@ -39,6 +39,7 @@ import org.apache.ibatis.session.Configuration;
 public class XMLStatementBuilder extends BaseBuilder {
 
   private final MapperBuilderAssistant builderAssistant;
+  /* mapper.xml 中的 SELECT|INSERT|UPDATE|DELETE 节点配置 */
   private final XNode context;
   private final String requiredDatabaseId;
 
@@ -85,6 +86,7 @@ public class XMLStatementBuilder extends BaseBuilder {
 
     // 数据库厂商标识 ID
     String lang = context.getStringAttribute("lang");
+    /* default driver class : org.apache.ibatis.scripting.xmltags.XMLLanguageDriver */
     LanguageDriver langDriver = getLanguageDriver(lang);
 
     // 针对 INSERT, UPDATE 主键字段值填充
@@ -105,7 +107,10 @@ public class XMLStatementBuilder extends BaseBuilder {
           ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
     }
 
-    // 获取到 SQL DML 源脚本配置
+    /* 获取到 SQL DML 源脚本配置
+    * ${param} 动态配置 -> org.apache.ibatis.scripting.xmltags.DynamicSqlSource
+    * #{param} -> org.apache.ibatis.scripting.defaults.RawSqlSource
+    * */
     SqlSource sqlSource = langDriver.createSqlSource(configuration, context, parameterTypeClass);
     StatementType statementType = StatementType.valueOf(context.getStringAttribute("statementType", StatementType.PREPARED.toString()));
     Integer fetchSize = context.getIntAttribute("fetchSize");
@@ -113,6 +118,9 @@ public class XMLStatementBuilder extends BaseBuilder {
     String parameterMap = context.getStringAttribute("parameterMap");
     String resultType = context.getStringAttribute("resultType");
     Class<?> resultTypeClass = resolveClass(resultType);
+    /* 手动配置的 <resultMap> </resultMap>, <select resultMap="map"></select> , 多个使用 , 逗号分隔
+    * org.apache.ibatis.builder.MapperBuilderAssistant.getStatementResultMaps
+    * */
     String resultMap = context.getStringAttribute("resultMap");
     String resultSetType = context.getStringAttribute("resultSetType");
     ResultSetType resultSetTypeEnum = resolveResultSetType(resultSetType);

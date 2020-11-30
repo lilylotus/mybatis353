@@ -337,22 +337,26 @@ public class MapperBuilderAssistant extends BaseBuilder {
     resultMap = applyCurrentNamespace(resultMap, true);
 
     List<ResultMap> resultMaps = new ArrayList<>();
+    // 没有配置 resultMap key 值
     if (resultMap != null) {
       String[] resultMapNames = resultMap.split(",");
       for (String resultMapName : resultMapNames) {
         try {
+          // 使用的是上面配置好的 resultMap
           resultMaps.add(configuration.getResultMap(resultMapName.trim()));
         } catch (IllegalArgumentException e) {
           throw new IncompleteElementException("Could not find result map '" + resultMapName + "' referenced from '" + statementId + "'", e);
         }
       }
     } else if (resultType != null) {
+      // 利用配置的 resultType 返回类型来处理
       ResultMap inlineResultMap = new ResultMap.Builder(
           configuration,
           statementId + "-Inline",
           resultType,
           new ArrayList<>(),
           null).build();
+      // 添加一个 resultType 的 resultMaps
       resultMaps.add(inlineResultMap);
     }
     return resultMaps;

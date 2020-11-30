@@ -196,6 +196,7 @@ public class DefaultSqlSession implements SqlSession {
   @Override
   public int update(String statement, Object parameter) {
     try {
+      // INSERT/UPDATE/DELETE 通用
       dirty = true;
       MappedStatement ms = configuration.getMappedStatement(statement);
       return executor.update(ms, wrapCollection(parameter));
@@ -321,6 +322,7 @@ public class DefaultSqlSession implements SqlSession {
   }
 
   private Object wrapCollection(final Object object) {
+    // Map
     if (object instanceof Collection) {
       StrictMap<Object> map = new StrictMap<>();
       map.put("collection", object);

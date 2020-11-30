@@ -25,12 +25,14 @@ public class LanguageDriverRegistry {
 
   private final Map<Class<? extends LanguageDriver>, LanguageDriver> LANGUAGE_DRIVER_MAP = new HashMap<>();
 
+  /* default: org.apache.ibatis.scripting.xmltags.XMLLanguageDriver */
   private Class<? extends LanguageDriver> defaultDriverClass;
 
   public void register(Class<? extends LanguageDriver> cls) {
     if (cls == null) {
       throw new IllegalArgumentException("null is not a valid Language Driver");
     }
+    /* add default: org.apache.ibatis.scripting.defaults.RawLanguageDriver */
     LANGUAGE_DRIVER_MAP.computeIfAbsent(cls, k -> {
       try {
         return k.getDeclaredConstructor().newInstance();

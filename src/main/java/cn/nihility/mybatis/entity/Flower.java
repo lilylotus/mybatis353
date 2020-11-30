@@ -27,6 +27,15 @@ public class Flower {
     this.age = age;
   }
 
+  public Flower(String id, String nameEnglish, String nameChinese, Integer age, LocalDateTime addTime, LocalDateTime updateTime) {
+    this.id = id;
+    this.nameEnglish = nameEnglish;
+    this.nameChinese = nameChinese;
+    this.age = age;
+    this.addTime = addTime;
+    this.updateTime = updateTime;
+  }
+
   public String getId() {
         return id;
     }

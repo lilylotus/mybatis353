@@ -61,6 +61,7 @@ public class MapperMethod {
     switch (command.getType()) {
       case INSERT: {
         Object param = method.convertArgsToSqlCommandParam(args);
+        // 其实内部还是处理的 update
         result = rowCountResult(sqlSession.insert(command.getName(), param));
         break;
       }
@@ -83,11 +84,15 @@ public class MapperMethod {
           result = executeForMany(sqlSession, args);
           // Map 返回类型
         } else if (method.returnsMap()) {
+          /* 1. 内部还是先 selectList : List<Map<String, Object>> 查出所有数据
+           * 2. 编辑 List 中对象，依据 @MapKey("Key") 中的 Key 获取对象中的数据作为 Map 的 Key 值
+           * */
           result = executeForMap(sqlSession, args);
         } else if (method.returnsCursor()) {
           result = executeForCursor(sqlSession, args);
         } else {
           Object param = method.convertArgsToSqlCommandParam(args);
+          // 内部也是 selectList 但是返回数据仅有一条，不然会报异常
           result = sqlSession.selectOne(command.getName(), param);
           if (method.returnsOptional()
               && (result == null || !method.getReturnType().equals(result.getClass()))) {
@@ -143,7 +148,8 @@ public class MapperMethod {
 
   private <E> Object executeForMany(SqlSession sqlSession, Object[] args) {
     List<E> result;
-    // 把传入的实参值和对应的参数 index 绑定起来，形成一个 arg:value map
+    // 把传入的实参值和对应的参数 index 绑定起来，形成一个 arg:value map,
+    // ParamMap -> HashMap 类型
     Object param = method.convertArgsToSqlCommandParam(args);
     if (method.hasRowBounds()) {
       RowBounds rowBounds = method.extractRowBounds(args);
@@ -231,7 +237,7 @@ public class MapperMethod {
       final String methodName = method.getName();
       final Class<?> declaringClass = method.getDeclaringClass();
       MappedStatement ms = resolveMappedStatement(mapperInterface, methodName, declaringClass,
-          configuration);
+        configuration);
       if (ms == null) {
         if (method.getAnnotation(Flush.class) != null) {
           name = null;
