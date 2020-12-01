@@ -103,7 +103,7 @@ class TypeParameterResolverTest {
     assertEquals(List.class, paramType.getRawType());
     assertEquals(1, paramType.getActualTypeArguments().length);
     assertTrue(paramType.getActualTypeArguments()[0] instanceof WildcardType);
-    WildcardType wildcard = (WildcardType) paramType.getActualTypeArguments()[0];
+    WildcardType wildcard = ((WildcardType) paramType.getActualTypeArguments()[0]);
     assertEquals(String.class, wildcard.getUpperBounds()[0]);
   }
 

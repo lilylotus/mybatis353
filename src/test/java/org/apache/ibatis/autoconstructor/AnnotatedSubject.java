@@ -30,6 +30,7 @@ public class AnnotatedSubject {
     this.age = age;
     this.height = height;
     this.weight = weight;
+    System.out.println("Normal Constructor");
   }
 
   @AutomapConstructor
@@ -39,5 +40,6 @@ public class AnnotatedSubject {
     this.age = age;
     this.height = height == null ? 0 : height;
     this.weight = weight == null ? 0 : weight;
+    System.out.println("AutomapConstructor");
   }
 }

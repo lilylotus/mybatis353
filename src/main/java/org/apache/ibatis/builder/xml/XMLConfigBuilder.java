@@ -357,6 +357,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       // type : POOLED -> org.apache.ibatis.datasource.pooled.PooledDataSourceFactory
       String type = context.getStringAttribute("type");
       Properties props = context.getChildrenAsProperties();
+      // PooledDataSource -> dataSource = new PooledDataSource(), 内部会自动初始化一个 PooledDataSource
       DataSourceFactory factory = (DataSourceFactory) resolveClass(type).getDeclaredConstructor().newInstance();
       factory.setProperties(props);
       return factory;

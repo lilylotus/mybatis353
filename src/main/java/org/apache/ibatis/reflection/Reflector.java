@@ -68,7 +68,8 @@ public class Reflector {
     addGetMethods(clazz);
     // 解析 set 方法和其参数，参数类型应该和相同 set 的返回类型一致，setTypes -> key: fieldName, value: paramType[0]
     addSetMethods(clazz);
-    // 解析对象属性
+    // 解析对象属性, 添加没有配置的 get/set 属性
+    // GetFieldInvoker/SetFieldInvoker
     addFields(clazz);
     readablePropertyNames = getMethods.keySet().toArray(new String[0]);
     writablePropertyNames = setMethods.keySet().toArray(new String[0]);
@@ -91,6 +92,7 @@ public class Reflector {
   private void addGetMethods(Class<?> clazz) {
     Map<String, List<Method>> conflictingGetters = new HashMap<>();
     Method[] methods = getClassMethods(clazz);
+    // methodToProperty : getAge -> age 还原字段属性， isActive -> active
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
     // 解决 get 方法冲突
@@ -240,9 +242,11 @@ public class Reflector {
         // pr #16 - final static can only be set by the classloader
         int modifiers = field.getModifiers();
         if (!(Modifier.isFinal(modifiers) && Modifier.isStatic(modifiers))) {
+          // 手动添加 set 方法， SetFieldInvoker
           addSetField(field);
         }
       }
+      // 添加属性 get 方法， GetFieldInvoker
       if (!getMethods.containsKey(field.getName())) {
         addGetField(field);
       }
@@ -295,6 +299,7 @@ public class Reflector {
         addUniqueMethods(uniqueMethods, anInterface.getMethods());
       }
 
+      // 处理超类 （父类）
       currentClass = currentClass.getSuperclass();
     }
 
@@ -306,6 +311,7 @@ public class Reflector {
   private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
     for (Method currentMethod : methods) {
       if (!currentMethod.isBridge()) {
+        // returnType#methodName:param1TypeName,param2TypeName
         String signature = getSignature(currentMethod);
         // check to see if the method is already known
         // if it is known, then an extended class must have

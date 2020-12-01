@@ -27,6 +27,7 @@ public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
   private final String children;
 
   public PropertyTokenizer(String fullname) {
+    // richType.richField 或者 List -> list[0] 或者 map -> map[key]
     int delim = fullname.indexOf('.');
     if (delim > -1) {
       name = fullname.substring(0, delim);
@@ -38,6 +39,7 @@ public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
     indexedName = name;
     delim = name.indexOf('[');
     if (delim > -1) {
+      // list[0] : map[key]
       index = name.substring(delim + 1, name.length() - 1);
       name = name.substring(0, delim);
     }

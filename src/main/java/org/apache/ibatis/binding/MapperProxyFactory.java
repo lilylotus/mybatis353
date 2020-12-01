@@ -31,6 +31,7 @@ public class MapperProxyFactory<T> {
   private final Map<Method, MapperMethod> methodCache = new ConcurrentHashMap<>();
 
   public MapperProxyFactory(Class<T> mapperInterface) {
+    // 对应的 Mybatis Mapper 接口
     this.mapperInterface = mapperInterface;
   }
 

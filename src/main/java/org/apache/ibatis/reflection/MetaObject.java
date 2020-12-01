@@ -140,6 +140,7 @@ public class MetaObject {
           metaValue = objectWrapper.instantiatePropertyValue(name, prop, objectFactory);
         }
       }
+      // 递归赋值
       metaValue.setValue(prop.getChildren(), value);
     } else {
       objectWrapper.set(prop, value);

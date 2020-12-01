@@ -94,12 +94,20 @@ public class XMLMapperBuilder extends BaseBuilder {
     if (!configuration.isResourceLoaded(resource)) {
       // 解析 mapper 节点下元数据
       configurationElement(parser.evalNode("/mapper"));
-      // 解析完成后的资源添加到资源集合
+      /* 解析完成后的资源添加到资源集合
+      * <mapper resource="mybatis/mapper/FlowerMapper.xml"/>
+      * resource -> mybatis/mapper/FlowerMapper.xml 或者
+      *
+      * <mapper url="file:///C:/mybatis/mapper/FlowerMapper.xml"/>
+      * resource -> file:///C:/mybatis/mapper/FlowerMapper.xml
+      * */
       configuration.addLoadedResource(resource);
       /*
       添加此处 mapper 的 namespace，创建 MapperProxyFactory 接口 mapper 代理工厂
       key : namespace 接口 class, value : MapperProxyFactory
       configuration 添加解析完成后的 namespace 到 loadedResources
+       <mapper namespace="cn.nihility.mybatis.mapper.FlowerMapper">
+       默认规则，解析 namespace 对应的 mapper 接口，在解析 mapepr 中的配置，如注解 ...
       */
       bindMapperForNamespace();
     }
@@ -437,16 +445,22 @@ public class XMLMapperBuilder extends BaseBuilder {
     if (namespace != null) {
       Class<?> boundType = null;
       try {
+        // 获取该 namespace (mapper 接口) 对应的 Class 属性
+        // ClassLoaderWrapper classLoaderWrapper = new ClassLoaderWrapper();
         boundType = Resources.classForName(namespace);
       } catch (ClassNotFoundException e) {
         //ignore, bound type is not required
       }
       if (boundType != null) {
+        // Configuration => MapperRegistry mapperRegistry 中是否含有解析完成的 Mapepr
         if (!configuration.hasMapper(boundType)) {
           // Spring may not know the real resource name so we set a flag
           // to prevent loading again this resource from the mapper interface
           // look at MapperAnnotationBuilder#loadXmlResource
+          // Configuration => Set<String> loadedResources
           configuration.addLoadedResource("namespace:" + namespace);
+          // Configuration => MapperRegistry mapperRegistry
+          // Class 类型为接口类型， 为每个接口初始化 MapperProxyFactory
           configuration.addMapper(boundType);
         }
       }

@@ -68,8 +68,27 @@ public class TypeParameterResolver {
     if (type instanceof TypeVariable) {
       return resolveTypeVar((TypeVariable<?>) type, srcType, declaringClass);
     } else if (type instanceof ParameterizedType) {
+      /* List<Double>
+      * paramType.getRawType() : List.class
+      * paramType.getActualTypeArguments().length : 1
+      * paramType.getActualTypeArguments()[0] : Double
+      *
+      * Map<Integer, Double>
+      * paramType.getRawType() ： Map.class
+      * paramType.getActualTypeArguments().length : 2
+      * paramType.getActualTypeArguments()[0] : Integer.class
+      * paramType.getActualTypeArguments()[2] : Double.class
+      *
+      * List<? extends String>
+      * paramType.getRawType() : List.class
+      * paramType.getActualTypeArguments().length : 1
+      * paramType.getActualTypeArguments()[0] instanceof WildcardType : true
+      * ((WildcardType) paramType.getActualTypeArguments()[0]).getUpperBounds()[0] : String.class
+      *
+      * */
       return resolveParameterizedType((ParameterizedType) type, srcType, declaringClass);
     } else if (type instanceof GenericArrayType) {
+      // List<N>[]， N[]
       return resolveGenericArrayType((GenericArrayType) type, srcType, declaringClass);
     } else {
       return type;

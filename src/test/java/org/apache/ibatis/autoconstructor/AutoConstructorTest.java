@@ -59,6 +59,8 @@ class AutoConstructorTest {
   void primitiveSubjects() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
+//      mapper.getSubjects();
+      // int 类型原型无法处理 null 值
       assertThrows(PersistenceException.class, mapper::getSubjects);
     }
   }
@@ -75,6 +77,8 @@ class AutoConstructorTest {
   void badSubject() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
+      // 对象类型无法转换
+//      mapper.getBadSubjects();
       assertThrows(PersistenceException.class, mapper::getBadSubjects);
     }
   }
