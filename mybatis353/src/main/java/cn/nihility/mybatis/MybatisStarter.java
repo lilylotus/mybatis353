@@ -29,6 +29,7 @@ public class MybatisStarter {
 
             List<Flower> gardenItemList = mapper.searchAll();
             System.out.println(gardenItemList);
+            session.commit();
 
           /*Map<String, Object> flowerMap = mapper.searchByIdAsMap(FLOWER_ID);
           System.out.println(flowerMap);

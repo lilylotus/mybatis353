@@ -91,12 +91,20 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     Transaction tx = null;
     /* 类是 JDBC 的初始化工作，声明 driver:url:user:password，拿到连接，等待执行 statement */
     try {
+      // 从配置 Configuration 中获取 datasource / txFactory (事务工厂)
+      // org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory
+      // org.apache.ibatis.datasource.pooled.PooledDataSourceFactory.getDataSource()
       final Environment environment = configuration.getEnvironment();
       // 从 configuration 获取解析好的数据连接事务， transaction : org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       /* 新建一个数据连接事务，内含一个数据库连接池， 默认 autoCommit = false, level = null
        * dataSource : org.apache.ibatis.datasource.pooled.PooledDataSourceFactory
        * 生成 : JdbcTransaction
+       *
+       * openSession() -> level: null , autoCommit: false
+       * -> org.apache.ibatis.transaction.jdbc.JdbcTransaction {
+       *    org.apache.ibatis.datasource.pooled.PooledDataSource
+       *  }
        * */
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
       // 新建 sql 执行器，搭配事务， 默认 execType = SIMPLE

@@ -48,6 +48,10 @@ import org.apache.ibatis.session.SqlSession;
 public class DefaultSqlSession implements SqlSession {
 
   private final Configuration configuration;
+  /**
+   * CachingExecutor { SimpleExecutor }
+   * JdbcTransaction { PooledDataSource }
+   */
   private final Executor executor;
 
   private final boolean autoCommit;

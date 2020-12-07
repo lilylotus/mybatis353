@@ -113,6 +113,11 @@ public class MapperScannerConfigurer
 
   private ApplicationContext applicationContext;
 
+  /**
+   * MapperScannerRegistrar.generateBaseBeanName()
+   * org.springframework.core.type.AnnotationMetadata#MapperScannerRegistrar#0
+   *
+   */
   private String beanName;
 
   private boolean processPropertyPlaceHolders;
@@ -334,10 +339,14 @@ public class MapperScannerConfigurer
    */
   @Override
   public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
+    // MapperScannerRegistrar -> true
     if (this.processPropertyPlaceHolders) {
+      // 处理变量属性替换
       processPropertyPlaceHolders();
     }
 
+    // Class Path Mapper 扫描实现，注册 mapper 接口，且接口中至少有一个方法
+    // ClassPathBeanDefinitionScanner
     ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
     scanner.setAddToConfig(this.addToConfig);
     scanner.setAnnotationClass(this.annotationClass);
@@ -347,7 +356,9 @@ public class MapperScannerConfigurer
     scanner.setSqlSessionFactoryBeanName(this.sqlSessionFactoryBeanName);
     scanner.setSqlSessionTemplateBeanName(this.sqlSessionTemplateBeanName);
     scanner.setResourceLoader(this.applicationContext);
+    // BeanNameGenerator - AnnotationBeanNameGenerator
     scanner.setBeanNameGenerator(this.nameGenerator);
+    // MapperFactoryBean
     scanner.setMapperFactoryBeanClass(this.mapperFactoryBeanClass);
     if (StringUtils.hasText(lazyInitialization)) {
       scanner.setLazyInitialization(Boolean.valueOf(lazyInitialization));
@@ -368,6 +379,7 @@ public class MapperScannerConfigurer
         false, false);
 
     if (!prcs.isEmpty() && applicationContext instanceof ConfigurableApplicationContext) {
+      // 获取 MapperScannerRegistrar 注册的 MapperScannerConfigurer 定义配置
       BeanDefinition mapperScannerBean = ((ConfigurableApplicationContext) applicationContext).getBeanFactory()
           .getBeanDefinition(beanName);
 
@@ -384,8 +396,11 @@ public class MapperScannerConfigurer
       PropertyValues values = mapperScannerBean.getPropertyValues();
 
       this.basePackage = updatePropertyValue("basePackage", values);
+      // null
       this.sqlSessionFactoryBeanName = updatePropertyValue("sqlSessionFactoryBeanName", values);
+      // null
       this.sqlSessionTemplateBeanName = updatePropertyValue("sqlSessionTemplateBeanName", values);
+      // null
       this.lazyInitialization = updatePropertyValue("lazyInitialization", values);
     }
     this.basePackage = Optional.ofNullable(this.basePackage).map(getEnvironment()::resolvePlaceholders).orElse(null);
