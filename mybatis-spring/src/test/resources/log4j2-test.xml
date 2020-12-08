@@ -25,7 +25,7 @@
     <Loggers>
         <Logger name="org.mybatis.spring" level="debug"/>
         <Logger name="org.springframework.jdbc" level="trace"/>
-        <Root level="warn">
+        <Root level="DEBUG">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>

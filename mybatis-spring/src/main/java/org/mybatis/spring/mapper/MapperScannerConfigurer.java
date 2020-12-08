@@ -341,12 +341,12 @@ public class MapperScannerConfigurer
   public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
     // MapperScannerRegistrar -> true
     if (this.processPropertyPlaceHolders) {
-      // 处理变量属性替换
+      // 处理变量属性替换 ${}
       processPropertyPlaceHolders();
     }
 
     // Class Path Mapper 扫描实现，注册 mapper 接口，且接口中至少有一个方法
-    // ClassPathBeanDefinitionScanner
+    // Inherit ClassPathBeanDefinitionScanner
     ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
     scanner.setAddToConfig(this.addToConfig);
     scanner.setAnnotationClass(this.annotationClass);
@@ -355,6 +355,7 @@ public class MapperScannerConfigurer
     scanner.setSqlSessionTemplate(this.sqlSessionTemplate);
     scanner.setSqlSessionFactoryBeanName(this.sqlSessionFactoryBeanName);
     scanner.setSqlSessionTemplateBeanName(this.sqlSessionTemplateBeanName);
+    // org.springframework.context.ApplicationContextAware
     scanner.setResourceLoader(this.applicationContext);
     // BeanNameGenerator - AnnotationBeanNameGenerator
     scanner.setBeanNameGenerator(this.nameGenerator);
@@ -363,7 +364,10 @@ public class MapperScannerConfigurer
     if (StringUtils.hasText(lazyInitialization)) {
       scanner.setLazyInitialization(Boolean.valueOf(lazyInitialization));
     }
+    // 注册具体的类型扫描器来搜索正确的 mapper 接口 （默认扫描所有）
+    // AnnotationTypeFilter/AssignableTypeFilter
     scanner.registerFilters();
+    // basePackage -> 若是没有填写默认为 @MapperScan 注解所在的包
     scanner.scan(
         StringUtils.tokenizeToStringArray(this.basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
   }

@@ -16,6 +16,7 @@
 package org.mybatis.spring.boot.autoconfigure;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.Resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,7 +37,10 @@ class MybatisPropertiesTest {
     properties
         .setMapperLocations(new String[] { "classpath:org/mybatis/spring/boot/autoconfigure/repository/CityMapper.xml",
             "classpath:org/mybatis/spring/boot/autoconfigure/repository/*Mapper.xml" });
-    assertThat(properties.resolveMapperLocations()).hasSize(2);
+    Resource[] resources = properties.resolveMapperLocations();
+    // ClassPathResource
+    // FileSystemResource
+    assertThat(resources).hasSize(2);
   }
 
   @Test

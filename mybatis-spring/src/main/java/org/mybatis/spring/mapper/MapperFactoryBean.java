@@ -53,6 +53,7 @@ import org.springframework.beans.factory.FactoryBean;
  */
 public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements FactoryBean<T> {
 
+  /** 具体的 mybatis mapper 接口类 */
   private Class<T> mapperInterface;
 
   private boolean addToConfig = true;

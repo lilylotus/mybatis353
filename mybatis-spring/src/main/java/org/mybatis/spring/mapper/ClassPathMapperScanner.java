@@ -45,7 +45,7 @@ import java.util.Set;
  *
  * @author Hunter Presnall
  * @author Eduardo Macarron
- * 
+ *
  * @see MapperFactoryBean
  * @since 1.2.0
  */
@@ -178,6 +178,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   public Set<BeanDefinitionHolder> doScan(String... basePackages) {
+    /* org.springframework.context.annotation.ClassPathBeanDefinitionScanner.doScan */
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
     if (beanDefinitions.isEmpty()) {
@@ -198,14 +199,21 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
       LOGGER.debug(() -> "Creating MapperFactoryBean with name '" + holder.getBeanName() + "' and '" + beanClassName
           + "' mapperInterface");
 
+      // 偷梁换柱，这个的 bean 定义内部实体由具体的 mapper 变为了 mapperFactoryBeanClass
       // the mapper interface is the original class of the bean
       // but, the actual class of the bean is MapperFactoryBean
       definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName); // issue #59
+      // MapperFactoryBean.class
       definition.setBeanClass(this.mapperFactoryBeanClass);
 
       definition.getPropertyValues().add("addToConfig", this.addToConfig);
 
       boolean explicitFactoryUsed = false;
+      /*
+       * 默认：
+       * sqlSessionFactoryBeanName -> null
+       * sqlSessionFactory -> null
+       */
       if (StringUtils.hasText(this.sqlSessionFactoryBeanName)) {
         definition.getPropertyValues().add("sqlSessionFactory",
             new RuntimeBeanReference(this.sqlSessionFactoryBeanName));
@@ -215,6 +223,10 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
         explicitFactoryUsed = true;
       }
 
+      /* 默认
+      * sqlSessionTemplateBeanName -> null
+      * sqlSessionTemplate -> null
+      * */
       if (StringUtils.hasText(this.sqlSessionTemplateBeanName)) {
         if (explicitFactoryUsed) {
           LOGGER.warn(
@@ -232,10 +244,12 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
         explicitFactoryUsed = true;
       }
 
+      // false
       if (!explicitFactoryUsed) {
         LOGGER.debug(() -> "Enabling autowire by type for MapperFactoryBean with name '" + holder.getBeanName() + "'.");
         definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
       }
+      // false
       definition.setLazyInit(lazyInitialization);
     }
   }
@@ -245,6 +259,10 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+    /* 重写了 ClassPathScanningCandidateComponentProvider.isCandidateComponent()
+    * 原来默认是要 class 不是 interface
+    * 此时要为接口
+    * */
     return beanDefinition.getMetadata().isInterface() && beanDefinition.getMetadata().isIndependent();
   }
 

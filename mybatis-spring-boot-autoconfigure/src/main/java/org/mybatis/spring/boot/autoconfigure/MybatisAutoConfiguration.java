@@ -120,6 +120,7 @@ public class MybatisAutoConfiguration implements InitializingBean {
   }
 
   private void checkConfigFileExists() {
+    // 检查 mybatis 的 xml 配置文件是否存在
     if (this.properties.isCheckConfigLocation() && StringUtils.hasText(this.properties.getConfigLocation())) {
       Resource resource = this.resourceLoader.getResource(this.properties.getConfigLocation());
       Assert.state(resource.exists(),
@@ -133,9 +134,11 @@ public class MybatisAutoConfiguration implements InitializingBean {
     SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
     factory.setDataSource(dataSource);
     factory.setVfs(SpringBootVFS.class);
+    // * configLocation -> mybatis 配置 xml 的位置
     if (StringUtils.hasText(this.properties.getConfigLocation())) {
       factory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));
     }
+    // 新建 Configuration 实例，添加到 SqlSessionFactoryBean
     applyConfiguration(factory);
     if (this.properties.getConfigurationProperties() != null) {
       factory.setConfigurationProperties(this.properties.getConfigurationProperties());
@@ -146,6 +149,7 @@ public class MybatisAutoConfiguration implements InitializingBean {
     if (this.databaseIdProvider != null) {
       factory.setDatabaseIdProvider(this.databaseIdProvider);
     }
+    // * mybatis 实体类的类型别名
     if (StringUtils.hasLength(this.properties.getTypeAliasesPackage())) {
       factory.setTypeAliasesPackage(this.properties.getTypeAliasesPackage());
     }
@@ -158,6 +162,7 @@ public class MybatisAutoConfiguration implements InitializingBean {
     if (!ObjectUtils.isEmpty(this.typeHandlers)) {
       factory.setTypeHandlers(this.typeHandlers);
     }
+    // mybatis mapper 接口对应的 xml 配置文件解析
     if (!ObjectUtils.isEmpty(this.properties.resolveMapperLocations())) {
       factory.setMapperLocations(this.properties.resolveMapperLocations());
     }

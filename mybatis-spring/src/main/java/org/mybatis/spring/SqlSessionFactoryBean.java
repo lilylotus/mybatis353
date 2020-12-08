@@ -506,6 +506,7 @@ public class SqlSessionFactoryBean
     final Configuration targetConfiguration;
 
     XMLConfigBuilder xmlConfigBuilder = null;
+    // 已经配置好的 Configuration
     if (this.configuration != null) {
       targetConfiguration = this.configuration;
       if (targetConfiguration.getVariables() == null) {
@@ -513,6 +514,7 @@ public class SqlSessionFactoryBean
       } else if (this.configurationProperties != null) {
         targetConfiguration.getVariables().putAll(this.configurationProperties);
       }
+      // 配置的 Configuration 配置文件的路径 (Resource)
     } else if (this.configLocation != null) {
       xmlConfigBuilder = new XMLConfigBuilder(this.configLocation.getInputStream(), null, this.configurationProperties);
       targetConfiguration = xmlConfigBuilder.getConfiguration();
@@ -527,6 +529,9 @@ public class SqlSessionFactoryBean
     Optional.ofNullable(this.objectWrapperFactory).ifPresent(targetConfiguration::setObjectWrapperFactory);
     Optional.ofNullable(this.vfs).ifPresent(targetConfiguration::setVfsImpl);
 
+    /*
+    * 扫描的类 1. 不是匿名类 2. 不是接口 3. 不是内部类
+    * */
     if (hasLength(this.typeAliasesPackage)) {
       scanClasses(this.typeAliasesPackage, this.typeAliasesSuperType).stream()
           .filter(clazz -> !clazz.isAnonymousClass()).filter(clazz -> !clazz.isInterface())
@@ -547,6 +552,9 @@ public class SqlSessionFactoryBean
       });
     }
 
+    /*
+    * 1. 不是接口 2. 不是抽象类 3. 不是匿名类
+    * */
     if (hasLength(this.typeHandlersPackage)) {
       scanClasses(this.typeHandlersPackage, TypeHandler.class).stream().filter(clazz -> !clazz.isAnonymousClass())
           .filter(clazz -> !clazz.isInterface()).filter(clazz -> !Modifier.isAbstract(clazz.getModifiers()))
@@ -592,10 +600,14 @@ public class SqlSessionFactoryBean
       }
     }
 
+    /*
+    * 数据环境配置， 事务工厂为 SpringManagedTransactionFactory { SpringManagedTransaction }
+    * */
     targetConfiguration.setEnvironment(new Environment(this.environment,
         this.transactionFactory == null ? new SpringManagedTransactionFactory() : this.transactionFactory,
         this.dataSource));
 
+    // 扫描 mapper 资源
     if (this.mapperLocations != null) {
       if (this.mapperLocations.length == 0) {
         LOGGER.warn(() -> "Property 'mapperLocations' was specified but matching resources are not found.");
@@ -620,6 +632,10 @@ public class SqlSessionFactoryBean
       LOGGER.debug(() -> "Property 'mapperLocations' was not specified.");
     }
 
+    /* mybatis 的 org.apache.ibatis.session.SqlSessionFactoryBuilder
+    * org.apache.ibatis.session.defaults.DefaultSqlSessionFactory
+    *   -> return new DefaultSqlSessionFactory(config);
+    * */
     return this.sqlSessionFactoryBuilder.build(targetConfiguration);
   }
 
