@@ -86,7 +86,7 @@ import static org.assertj.core.api.Assertions.fail;
  * @author Josh Long
  * @author Kazuki Shimizu
  */
-class MybatisAutoConfigurationTest {
+public class MybatisAutoConfigurationTest {
 
   private AnnotationConfigApplicationContext context;
 
@@ -689,7 +689,7 @@ class MybatisAutoConfigurationTest {
   }
 
   @Configuration
-  static class MultipleDataSourceConfiguration {
+  public static class MultipleDataSourceConfiguration {
     @Bean
     DataSource dataSourceMaster() {
       return Mockito.mock(DataSource.class);

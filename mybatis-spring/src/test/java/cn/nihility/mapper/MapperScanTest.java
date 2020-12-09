@@ -1,5 +1,6 @@
 package cn.nihility.mapper;
 
+import cn.nihility.mapper.child.ExcludeFilterClass;
 import cn.nihility.mapper.child.IncludeFilterClass;
 import com.mockrunner.mock.jdbc.MockDataSource;
 import org.junit.jupiter.api.Assertions;
@@ -39,9 +40,12 @@ public class MapperScanTest {
 
     System.out.println(ctx.getBean("includeFilterClass"));
 
-    Assertions.assertThrows(NoSuchBeanDefinitionException.class,
+    /*Assertions.assertThrows(NoSuchBeanDefinitionException.class,
       () -> ctx.getBean("excludeFilterClass"),
-      "No bean named 'excludeFilterClass' available");
+      "No bean named 'excludeFilterClass' available");*/
+
+    Assertions.assertNotNull(ctx.getBean(ExcludeFilterClass.class));
+    Assertions.assertNotNull(ctx.getBean("ExcludeFilterClass"));
 
     System.out.println(ctx.getBean(IncludeFilterClass.class));
 

@@ -79,8 +79,29 @@ public class MybatisAutoConfiguration implements InitializingBean {
 
 调用方法 `getObject()` 获取 `SqlSessionFactory` (`DefaultSqlSessionFactory`)
 其中做了： 1. mybatis 的 xml 配置文件解析。 2. mapper 接口对应的 xml 配置文件解析 (mapperLocations)
+`DefaultSqlSessionFactory` 会注入 `SqlSessionTemplate` 实例当中
 
 ```
 new SqlSessionFactoryBuilder().build(Configuration);
   -> return new DefaultSqlSessionFactory(config);
 ```
+
+### mybatis boot (MybatisAutoConfiguration) 实体关联
+
+1. SqlSessionFactoryBean -> getObject -> DefaultSqlSessionFactory
+2. SqlSessionTemplate 中注入 1 中的 DefaultSqlSessionFactory
+
+#### mybatis spring 中流程
+
+1. MapperScannerRegistrar 注入 spring 容器 MapperScannerConfigurer bean
+2. MapperScannerConfigurer -> 指定 ClassPathMapperScanner 类扫描 mapper 包下所有接口为 BeanDefinitionHolder
+3. 后置在把 bean 定义 definition.setBeanClass 为 MapperFactoryBean （偷梁换柱）
+4. MapperFactoryBean 获取 mapper 从 SqlSessionTemplate 中获取
+5. SqlSessionTemplate 从 getConfiguration() 的 Configuration 中保存解析的 mapper MapperRegistry 中获取
+6. MapperProxyFactory 获取具体的 MapperProxy 代理来执行
+
+* mybatis spring
+    * @MapperScan 扫描的 mapper -> MapperFactoryBean 需要 SqlSessionTemplate (mapper 加入 spring 容器)
+* mybatis spring boot
+    * (SqlSessionFactory) -> SqlSessionFactoryBean 注册/解析 -> getObject -> DefaultSqlSessionFactory (mybatis 管理 mapperPoxy)
+    * SqlSessionTemplate 需要 -> SqlSessionFactory (mybatis 管理的 SqlSession)

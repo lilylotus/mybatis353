@@ -589,6 +589,9 @@ public class SqlSessionFactoryBean
 
     Optional.ofNullable(this.cache).ifPresent(targetConfiguration::addCache);
 
+    /* 当 mybatis 的 mybatis-config.xml 的存在的时候，需要解析这个配置
+    * 通常在 spring boot 中使用时，是没有配置 mapper 和 datasource 的
+    * */
     if (xmlConfigBuilder != null) {
       try {
         xmlConfigBuilder.parse();
@@ -602,6 +605,7 @@ public class SqlSessionFactoryBean
 
     /*
     * 数据环境配置， 事务工厂为 SpringManagedTransactionFactory { SpringManagedTransaction }
+    * 覆盖在 mybatis-config.xml 中配置的数据源环境配置
     * */
     targetConfiguration.setEnvironment(new Environment(this.environment,
         this.transactionFactory == null ? new SpringManagedTransactionFactory() : this.transactionFactory,
@@ -617,6 +621,7 @@ public class SqlSessionFactoryBean
             continue;
           }
           try {
+            // 具体解析 mybatis.mapper-locations 配置下扫描到的 mapper 资源
             XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(mapperLocation.getInputStream(),
                 targetConfiguration, mapperLocation.toString(), targetConfiguration.getSqlFragments());
             xmlMapperBuilder.parse();
