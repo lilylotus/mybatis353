@@ -17,6 +17,7 @@ package org.apache.ibatis.plugin;
 
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,12 +39,47 @@ class PluginTest {
     assertNotEquals("Always", map.toString());
   }
 
+  @Test
+  void multiPlugin() {
+    Map map = new HashMap();
+    Map map1 = (Map) new AlwaysMapPlugin().plugin(map);
+    Map map2 = (Map) new OkMapPlugin().plugin(map1);
+    Object anything0 = map.get("Anything");
+    Object anything1 = map1.get("Anything");
+    Object anything2 = map2.get("Anything");
+
+    AlwaysMapPlugin plugin = new AlwaysMapPlugin();
+    Class<?> declaringClass = plugin.getClass().getDeclaringClass();
+    System.out.println(declaringClass);
+
+    System.out.println(plugin.getClass().getSuperclass());
+
+    /*
+     * map2.get() -> OkMapPlugin:intercept <- Ok + (map1)invocation.proceed();
+     * AlwaysMapPlugin:intercept <- "Always :" + map.get()
+     * Ok : Always : null
+     */
+    System.out.println(anything0);
+    System.out.println(anything1);
+    System.out.println(anything2);
+  }
+
   @Intercepts({
       @Signature(type = Map.class, method = "get", args = {Object.class})})
   public static class AlwaysMapPlugin implements Interceptor {
     @Override
-    public Object intercept(Invocation invocation) {
-      return "Always";
+    public Object intercept(Invocation invocation) throws InvocationTargetException, IllegalAccessException {
+      return "Always : " + invocation.proceed();
+    }
+
+  }
+
+  @Intercepts({
+    @Signature(type = Map.class, method = "get", args = {Object.class})})
+  public static class OkMapPlugin implements Interceptor {
+    @Override
+    public Object intercept(Invocation invocation) throws InvocationTargetException, IllegalAccessException {
+      return "Ok : " + invocation.proceed();
     }
 
   }

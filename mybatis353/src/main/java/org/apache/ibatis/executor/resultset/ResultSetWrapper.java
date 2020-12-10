@@ -53,11 +53,17 @@ public class ResultSetWrapper {
     super();
     this.typeHandlerRegistry = configuration.getTypeHandlerRegistry();
     this.resultSet = rs;
+    // 获取执行 Statement 的元数据信息
     final ResultSetMetaData metaData = rs.getMetaData();
+    // 返回列的数量
     final int columnCount = metaData.getColumnCount();
+    // 列 index 从 1 开始
     for (int i = 1; i <= columnCount; i++) {
+      // 列的名称， SELECT age, id -> AGE : ID (大写)
       columnNames.add(configuration.isUseColumnLabel() ? metaData.getColumnLabel(i) : metaData.getColumnName(i));
+      // 返回列对应的数据类型: INTEGER : VERCHAR
       jdbcTypes.add(JdbcType.forCode(metaData.getColumnType(i)));
+      // 对应列的 Class name : java.lang.Integer | java.lang.String
       classNames.add(metaData.getColumnClassName(i));
     }
   }

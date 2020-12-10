@@ -103,7 +103,10 @@ public final class SqlSessionUtils {
     }
 
     LOGGER.debug(() -> "Creating a new SqlSession");
-    // 没有 SqlSession 新建一个 Session
+    /* 没有 SqlSession 新建一个 Session
+    * org.apache.ibatis.session.defaults.DefaultSqlSessionFactory.openSessionFromDataSource
+    * -> new DefaultSqlSession(configuration, executor, autoCommit);
+    * */
     session = sessionFactory.openSession(executorType);
 
     // 注册新建的 session

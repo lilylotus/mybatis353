@@ -28,6 +28,8 @@ public class ProxyTest {
     System.out.println(obj.getClass());
     System.out.println("---------------");
     System.out.println(obj.getClass().getName());
+    System.out.println("--------------");
+    System.out.println(obj.getClass().getDeclaringClass());
 
   }
 

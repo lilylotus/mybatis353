@@ -135,6 +135,7 @@ public class MybatisAutoConfiguration implements InitializingBean {
     factory.setDataSource(dataSource);
     factory.setVfs(SpringBootVFS.class);
     // * configLocation -> mybatis 配置 xml 的位置
+    // mybatis.configLocation
     if (StringUtils.hasText(this.properties.getConfigLocation())) {
       factory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));
     }
@@ -150,6 +151,7 @@ public class MybatisAutoConfiguration implements InitializingBean {
       factory.setDatabaseIdProvider(this.databaseIdProvider);
     }
     // * mybatis 实体类的类型别名
+    // 配置： mybatis.typeAliasesPackage: xx
     if (StringUtils.hasLength(this.properties.getTypeAliasesPackage())) {
       factory.setTypeAliasesPackage(this.properties.getTypeAliasesPackage());
     }
@@ -163,6 +165,7 @@ public class MybatisAutoConfiguration implements InitializingBean {
       factory.setTypeHandlers(this.typeHandlers);
     }
     // mybatis mapper 接口对应的 xml 配置文件解析
+    // 配置： mybatis.mapperLocations: ...
     if (!ObjectUtils.isEmpty(this.properties.resolveMapperLocations())) {
       factory.setMapperLocations(this.properties.resolveMapperLocations());
     }
@@ -181,20 +184,25 @@ public class MybatisAutoConfiguration implements InitializingBean {
       // Need to mybatis-spring 2.0.2+
       factory.setDefaultScriptingLanguageDriver(defaultLanguageDriver);
     }
-
+    /* org.mybatis.spring.SqlSessionFactoryBean.buildSqlSessionFactory
+    * new SqlSessionFactoryBuilder().build(Configuration) -> new DefaultSqlSessionFactory(config)
+    * */
     return factory.getObject();
   }
 
   private void applyConfiguration(SqlSessionFactoryBean factory) {
     Configuration configuration = this.properties.getConfiguration();
+    // configuration 未配置，且 configLocation 配置了位置
     if (configuration == null && !StringUtils.hasText(this.properties.getConfigLocation())) {
       configuration = new Configuration();
     }
+    // configuration 存在且 configurationCustomizers 由自定义配置
     if (configuration != null && !CollectionUtils.isEmpty(this.configurationCustomizers)) {
       for (ConfigurationCustomizer customizer : this.configurationCustomizers) {
         customizer.customize(configuration);
       }
     }
+    // 配置了 configLocation 后这个为 null
     factory.setConfiguration(configuration);
   }
 
@@ -205,6 +213,11 @@ public class MybatisAutoConfiguration implements InitializingBean {
     if (executorType != null) {
       return new SqlSessionTemplate(sqlSessionFactory, executorType);
     } else {
+      /*
+      * 默认的：ExecutorType -> Configuration.ExecutorType.SIMPLE
+      * + new MyBatisExceptionTranslator()
+      * + SqlSession sqlSessionProxy -> org.mybatis.spring.SqlSessionTemplate.SqlSessionInterceptor
+      * */
       return new SqlSessionTemplate(sqlSessionFactory);
     }
   }

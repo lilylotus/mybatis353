@@ -301,6 +301,10 @@ public class SqlSessionTemplate implements SqlSession, DisposableBean {
    */
   @Override
   public <T> T getMapper(Class<T> type) {
+    /* org.apache.ibatis.binding.MapperRegistry.getMapper()
+    * -> org.apache.ibatis.binding.MapperProxyFactory.newInstance(org.apache.ibatis.session.SqlSession)
+    * -> new MapperProxy<>(sqlSession, mapperInterface, methodCache);
+    * */
     return getConfiguration().getMapper(type, this);
   }
 

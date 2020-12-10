@@ -175,6 +175,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     validateResultMapsCount(rsw, resultMapCount);
     while (rsw != null && resultMapCount > resultSetCount) {
       ResultMap resultMap = resultMaps.get(resultSetCount);
+      // 处理/保存查询结果 - 一个结果集
       handleResultSet(rsw, resultMap, multipleResults, null);
       rsw = getNextResultSet(stmt);
       cleanUpAfterHandlingResultSet();
@@ -195,7 +196,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
         resultSetCount++;
       }
     }
-
+    // multipleResults - List<Object> : 如果含有一个值内部也定是一个 List, 直接返回内部 List
     return collapseSingleResultList(multipleResults);
   }
 
@@ -280,7 +281,10 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       if (parentMapping != null) {
         handleRowValues(rsw, resultMap, null, RowBounds.DEFAULT, parentMapping);
       } else {
+        // 默认 resultHandler 为空
         if (resultHandler == null) {
+          // Configuration -> new DefaultObjectFactory();
+          // 创建一个 List<Object> = ArrayList<Object>
           DefaultResultHandler defaultResultHandler = new DefaultResultHandler(objectFactory);
           handleRowValues(rsw, resultMap, defaultResultHandler, rowBounds, null);
           multipleResults.add(defaultResultHandler.getResultList());
@@ -333,9 +337,12 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     DefaultResultContext<Object> resultContext = new DefaultResultContext<>();
     ResultSet resultSet = rsw.getResultSet();
     skipRows(resultSet, rowBounds);
+    // resultSet.next() -> 查询数据结果集的数据处理
     while (shouldProcessMoreRows(resultContext, rowBounds) && !resultSet.isClosed() && resultSet.next()) {
       ResultMap discriminatedResultMap = resolveDiscriminatedResultMap(resultSet, resultMap, null);
+      // 处理一行的数据， resultSet.getObject()
       Object rowValue = getRowValue(rsw, discriminatedResultMap, null);
+      // 添加行数据到 resultHandler （DefaultResultHandler : List<Object>)
       storeObject(resultHandler, resultContext, rowValue, parentMapping, resultSet);
     }
   }
@@ -384,6 +391,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       final MetaObject metaObject = configuration.newMetaObject(rowValue);
       boolean foundValues = this.useConstructorMappings;
       if (shouldApplyAutomaticMappings(resultMap, false)) {
+        /* 依据 UnMappedColumnAutoMapping 和封装的 Statement 列元数据和返回的对象属性关联， setter 方法赋值  */
         foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, columnPrefix) || foundValues;
       }
       foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
@@ -463,8 +471,10 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     List<UnMappedColumnAutoMapping> autoMapping = autoMappingsCache.get(mapKey);
     if (autoMapping == null) {
       autoMapping = new ArrayList<>();
+      // 获取 Statement 元数据中对应列的名称
       final List<String> unmappedColumnNames = rsw.getUnmappedColumnNames(resultMap, columnPrefix);
       for (String columnName : unmappedColumnNames) {
+        // 每列的名称
         String propertyName = columnName;
         if (columnPrefix != null && !columnPrefix.isEmpty()) {
           // When columnPrefix is specified,
@@ -475,14 +485,18 @@ public class DefaultResultSetHandler implements ResultSetHandler {
             continue;
           }
         }
+        // 找到每列 名称 在 metaObject （对应行实例对象） 中对应的数据字段， ID -> class Subject { String id; }
         final String property = metaObject.findProperty(propertyName, configuration.isMapUnderscoreToCamelCase());
+        // 对象中含有该字段并且还有它的 setter 方法
         if (property != null && metaObject.hasSetter(property)) {
           if (resultMap.getMappedProperties().contains(property)) {
             continue;
           }
           final Class<?> propertyType = metaObject.getSetterType(property);
+          // 是否有指定属性 - JdbcType 转换的 handler
           if (typeHandlerRegistry.hasTypeHandler(propertyType, rsw.getJdbcType(columnName))) {
             final TypeHandler<?> typeHandler = rsw.getTypeHandler(propertyType, columnName);
+            // 填加 reset 列数据和返回实体属性关联和 JdbcType -> 实体属性数据类型处理器
             autoMapping.add(new UnMappedColumnAutoMapping(columnName, property, typeHandler, propertyType.isPrimitive()));
           } else {
             configuration.getAutoMappingUnknownColumnBehavior()
@@ -499,10 +513,15 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   }
 
   private boolean applyAutomaticMappings(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix) throws SQLException {
+    /* 创建 UnMappedColumnAutoMapping
+    * 执行 statement (ResultSetWrapper) 元数据列属性名称/JDBC TYPE/Class 类型关系
+    * 和具体的返回实体对象 （metaObject） 的 列属性和字段属性关联，属性值转换处理器 (TypeHandler)
+    * */
     List<UnMappedColumnAutoMapping> autoMapping = createAutomaticMappings(rsw, resultMap, metaObject, columnPrefix);
     boolean foundValues = false;
     if (!autoMapping.isEmpty()) {
       for (UnMappedColumnAutoMapping mapping : autoMapping) {
+        // 处理 ResultSet 行数据，依据 jdbc statement 的列数据转为实体对象的字段属性值
         final Object value = mapping.typeHandler.getResult(rsw.getResultSet(), mapping.column);
         if (value != null) {
           foundValues = true;
@@ -591,7 +610,10 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   private Object createResultObject(ResultSetWrapper rsw, ResultMap resultMap, List<Class<?>> constructorArgTypes, List<Object> constructorArgs, String columnPrefix)
       throws SQLException {
+    // 找到 mapepr 对应的 resultType 类型
+    // List<Subject> selectAll(); -> Subject
     final Class<?> resultType = resultMap.getType();
+    // 获取对应 resultType Class 的元数据
     final MetaClass metaType = MetaClass.forClass(resultType, reflectorFactory);
     final List<ResultMapping> constructorMappings = resultMap.getConstructorResultMappings();
     // 是否有 org.apache.ibatis.type.TypeHandlerRegistry 初始化注册的数据类型实例
@@ -602,6 +624,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       return createParameterizedResultObject(rsw, resultType, constructorMappings, constructorArgTypes, constructorArgs, columnPrefix);
     } else if (resultType.isInterface() || metaType.hasDefaultConstructor()) {
       // 使用配置好的默认对象创建工厂来创建对象, org.apache.ibatis.reflection.factory.DefaultObjectFactory
+      // 使用默认构造函数，初始化 （实例化）一个 resultType 类型的对象
       return objectFactory.create(resultType);
     } else if (shouldApplyAutomaticMappings(resultMap, false)) {
       return createByConstructorSignature(rsw, resultType, constructorArgTypes, constructorArgs);

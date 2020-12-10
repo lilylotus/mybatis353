@@ -11,6 +11,8 @@ import org.junit.jupiter.api.*;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -27,6 +29,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class MybatisAutoConfigureTest {
+
+  private static final Logger log = LoggerFactory.getLogger(MybatisAutoConfigureTest.class);
 
   private AnnotationConfigApplicationContext context;
   private static UnpooledDataSource dataSource;
@@ -74,6 +78,7 @@ public class MybatisAutoConfigureTest {
 
     SubjectMapper subjectMapper = context.getBean(SubjectMapper.class);
     Assertions.assertNotNull(subjectMapper);
+    log.info("subjectMapper [{}]", subjectMapper);
 
     List<Subject> subjects = subjectMapper.selectAll();
     Assertions.assertNotNull(subjects);
@@ -128,7 +133,7 @@ public class MybatisAutoConfigureTest {
 
   @Configuration
   @MapperScan(basePackages = {"cn.nihility.auto.mapper"})
-  @EnableAutoConfiguration
+  /*@EnableAutoConfiguration*/
   static class MybatisMapperScanConfig { }
 
   @Configuration
