@@ -71,7 +71,7 @@ public class MapperRegistry {
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
-        // 加载对应 mapper 接口的 mybatis 注解
+        // 加载对应 mapper 接口的 mybatis 注解, 默认解析 type 对应包下面的 mapper.xml 配置文件
         parser.parse();
         loadCompleted = true;
       } finally {

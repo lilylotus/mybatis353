@@ -151,6 +151,8 @@ public class DefaultSqlSession implements SqlSession {
       /* Executor.NO_RESULT_HANDLER -> null
       * parameter -> map {0:value ...}
       * wrapCollection -> collection:map , list: list, array: array
+      *
+      * RowBounds -> RowBounds.DEFAULT
       * */
       return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
     } catch (Exception e) {

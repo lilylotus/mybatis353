@@ -3,14 +3,13 @@ package cn.nihility.mybatis.jdbc;
 import cn.nihility.mybatis.entity.Flower;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.ibatis.type.JdbcType;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -20,8 +19,8 @@ public class NormalJdbcTest {
 
   private static Connection connection;
 
-  @BeforeAll
-  public static void init() throws ClassNotFoundException, SQLException {
+  @BeforeEach
+  public void init() throws ClassNotFoundException, SQLException {
     String user = "root";
     String password = "mysql";
     String classDriver = "com.mysql.cj.jdbc.Driver";
@@ -29,6 +28,42 @@ public class NormalJdbcTest {
     Class.forName(classDriver);
     connection = DriverManager.getConnection(url, user, password);
   }
+
+  @AfterEach
+  public void closeConnection() throws SQLException {
+    if (null != connection) {
+      connection.close();
+    }
+  }
+
+  @Test
+  public void autoGenerateKey() {
+    PreparedStatement statement = null;
+    String sql = "INSERT INTO auto_increment_id (name, add_time, update_time) VALUES (?, NOW(), NOW())";
+    try {
+      statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+      statement.setString(1, "自动添加:" + UUID.randomUUID().toString().substring(0, 8));
+      statement.execute();
+      // Statement.RETURN_GENERATED_KEYS to Statement.executeUpdate(), Statement.executeLargeUpdate() or Connection.prepareStatement().
+
+      final ResultSet resultSet = statement.getGeneratedKeys();
+      while (resultSet.next()) {
+        System.out.println(resultSet.getObject(1));
+      }
+      resultSet.close();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      if (null != statement) {
+        try {
+          statement.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
 
   @Test
   public void selectAll() {
@@ -176,11 +211,6 @@ public class NormalJdbcTest {
     }
   }
 
-  @AfterAll
-  public static void closeConnection() throws SQLException {
-    if (null != connection) {
-      connection.close();
-    }
-  }
+
 
 }

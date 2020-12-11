@@ -3,6 +3,70 @@
 
 <mapper namespace="cn.nihility.mybatis.mapper.FlowerMapper">
 
+  <resultMap id="innerResultMapSelect" type="gardener">
+    <id property="id" column="id"/>
+    <result property="name" column="name"/>
+    <result property="age" column="age"/>
+    <result property="addTime" column="add_time"/>
+    <result property="updateTime" column="update_time"/>
+
+    <association property="partner" column="id" javaType="gardener" select="selectGardnerById"/>
+    <collection property="flowers" column="id" ofType="flower" select="selectFlowersByGardenerId"/>
+  </resultMap>
+
+  <resultMap id="innerResultMap" type="gardener">
+    <id property="id" column="id"/>
+    <result property="name" column="name"/>
+    <result property="age" column="age"/>
+    <result property="addTime" column="add_time"/>
+    <result property="updateTime" column="update_time"/>
+
+    <association property="partner" column="id" javaType="gardener" select="selectGardnerById"/>
+    <!-- 缺点，得把所有得数据在 SQL 中一行查询出来 -->
+    <!--<association property="partner" javaType="gardener">
+      <id property="id" column="partner_id" />
+      <result property="name" column="partner_name"/>
+      <result property="age" column="partner_age"/>
+      <result property="addTime" column="partner_add_time"/>
+      <result property="updateTime" column="partner_update_time"/>
+    </association>-->
+    <collection property="flowers" ofType="flower">
+      <id property="id" column="flower_id"/>
+      <result property="nameChinese" column="flower_name_chinese"/>
+      <result property="nameEnglish" column="flower_name_english"/>
+      <result property="age" column="flower_age"/>
+      <result property="addTime" column="flower_add_time"/>
+      <result property="updateTime" column="flower_update_time"/>
+    </collection>
+  </resultMap>
+
+  <select id="selectGardenerByIdWithResultMapSelect" resultMap="innerResultMapSelect">
+    SELECT gd.id, gd.name, gd.age, gd.add_time, gd.update_time
+    FROM gardener gd
+    WHERE gd.id = #{id}
+  </select>
+
+  <select id="selectGardenerByIdWithResultMap" resultMap="innerResultMap">
+    SELECT gd.id, gd.name, gd.age, gd.add_time, gd.update_time,
+           f.id flower_id, f.name_english flower_name_english, f.name_chinese flower_name_chinese,
+           f.age flower_age, f.add_time flower_add_time, f.update_time flower_update_time
+    FROM gardener gd LEFT JOIN gardener_flower gf ON gd.id = gf.gardener_id
+        LEFT JOIN flower f ON f.id = gf.flower_id
+    WHERE gd.id = #{id}
+  </select>
+
+  <select id="selectGardnerById" resultType="gardener" parameterType="string">
+    SELECT id, name, age, add_time, update_time
+    FROM gardener
+    WHERE id = #{id}
+  </select>
+
+  <select id="selectFlowersByGardenerId" resultType="flower" parameterType="string">
+    SELECT fl.id, fl.name_english, fl.name_chinese, fl.age, fl.add_time, fl.update_time
+    FROM flower fl, gardener_flower gf
+    WHERE fl.id = gf.flower_id AND gf.gardener_id = #{id}
+  </select>
+
   <select id="searchById" resultType="flower" parameterType="string">
     SELECT id, name_english, name_chinese, age, add_time, update_time
     FROM flower
@@ -25,6 +89,21 @@
     FROM flower
   </select>
 
+  <!-- Mysql 自增主键，返回实体 id 会被 mysql 自增主键赋值 statement.getGenreatedKeys() -->
+  <insert id="insertMysqlAutoGenerateId" parameterType="autoIncrementEntity"
+          useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO auto_increment_id (name, add_time, update_time)
+    VALUES (#{name}, now(), now())
+  </insert>
+
+  <insert id="insertNoAutoGenerateId" parameterType="flower" keyProperty="id">
+    <selectKey keyProperty="id" keyColumn="id" resultType="string" order="BEFORE" >
+        SELECT NOW()
+    </selectKey>
+    INSERT INTO flower (id, name_english, name_chinese, age, add_time, update_time)
+    VALUES (#{id}, #{nameEnglish}, #{nameChinese}, #{age}, now(), now())
+  </insert>
+
   <insert id="insertByEntity" parameterType="flower">
     INSERT INTO flower (id, name_english, name_chinese, age, add_time, update_time)
     VALUES (#{id}, #{nameEnglish}, #{nameChinese}, #{age}, now(), now())
@@ -45,11 +124,11 @@
     UPDATE flower
     SET ${field} = #{param3}, update_time = now()
     WHERE id = #{param1}
-<choose>
-  <when test="arg != null"> statement </when>
-  <when test="arg1 != null"> statement1 </when>
-  <otherwise> otherwise_statement </otherwise>
-</choose>
+    <choose>
+      <when test="arg != null">statement</when>
+      <when test="arg1 != null">statement1</when>
+      <otherwise>otherwise_statement</otherwise>
+    </choose>
   </update>
 
   <update id="updateNameById">

@@ -1,6 +1,8 @@
 package cn.nihility.mybatis.mapper;
 
+import cn.nihility.mybatis.entity.AutoIncrementEntity;
 import cn.nihility.mybatis.entity.Flower;
+import cn.nihility.mybatis.entity.Gardener;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
@@ -28,5 +30,13 @@ public interface FlowerMapper {
   Integer updateColumnById(String id, @Param("field") String field, Object data);
 
   Integer deleteById(String id);
+
+  Gardener selectGardenerByIdWithResultMap(String id);
+
+  Gardener selectGardenerByIdWithResultMapSelect(String id);
+
+  Integer insertMysqlAutoGenerateId(AutoIncrementEntity entity);
+
+  Integer insertNoAutoGenerateId(Flower entity);
 
 }
