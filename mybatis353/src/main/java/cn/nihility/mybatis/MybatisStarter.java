@@ -1,6 +1,5 @@
 package cn.nihility.mybatis;
 
-import cn.nihility.mybatis.entity.AutoIncrementEntity;
 import cn.nihility.mybatis.entity.Flower;
 import cn.nihility.mybatis.mapper.FlowerMapper;
 import org.apache.ibatis.io.Resources;
@@ -14,7 +13,7 @@ import java.util.List;
 
 public class MybatisStarter {
 
-    private static final String FLOWER_ID = "00009";
+  private static final String FLOWER_ID = "00009";
   private static final String MYBATIS_CONFIG_LOCATION = "mybatis/mybatis-config.xml";
 
   public static void main(String[] args) throws IOException {
