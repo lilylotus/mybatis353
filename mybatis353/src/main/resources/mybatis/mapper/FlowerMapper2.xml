@@ -19,16 +19,16 @@
     VALUES (#{id}, #{nameEnglish}, #{nameChinese}, #{age}, now(), now())
   </insert>
 
-    <update id="updateByEntity" parameterType="flower">
-        UPDATE flower
-        <set>
-          <if test="nameEnglish != null">name_english=#{nameEnglish},</if>
-          <if test="nameChinese != null">name_chinese=#{nameChinese},</if>
-          <if test="age != null">age=#{age},</if>
-          update_time = now()
-        </set>
-        WHERE id = #{id}
-    </update>
+  <update id="updateByEntity" parameterType="flower">
+      UPDATE flower
+      <set>
+        <if test="nameEnglish != null">name_english=#{nameEnglish},</if>
+        <if test="nameChinese != null">name_chinese=#{nameChinese},</if>
+        <if test="age != null">age=#{age},</if>
+        update_time = now()
+      </set>
+      WHERE id = #{id}
+  </update>
 
   <update id="updateNameById">
     UPDATE flower

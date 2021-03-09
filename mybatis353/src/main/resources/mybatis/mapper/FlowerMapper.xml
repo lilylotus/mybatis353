@@ -84,6 +84,18 @@
     FROM flower
   </select>
 
+  <select id="searchLikeEnglishName" resultType="flower" parameterType="string">
+    SELECT id, name_english, name_chinese, age, add_time, update_time
+    FROM flower
+    WHERE name_english LIKE CONCAT(CONCAT('%', #{name}), '%')
+  </select>
+
+  <select id="searchLikeEnglishName2" resultType="flower" parameterType="string">
+    SELECT id, name_english, name_chinese, age, add_time, update_time
+    FROM flower
+    WHERE name_english LIKE "%"#{name}"%"
+  </select>
+
   <select id="searchAllAsMap" resultType="map">
     SELECT id, name_english, name_chinese, age, add_time, update_time
     FROM flower

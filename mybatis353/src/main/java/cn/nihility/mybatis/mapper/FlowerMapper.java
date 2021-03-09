@@ -18,6 +18,10 @@ public interface FlowerMapper {
 
   List<Flower> searchAll();
 
+  List<Flower> searchLikeEnglishName(String name);
+
+  List<Flower> searchLikeEnglishName2(String name);
+
   @MapKey("id")
   Map<String, Object> searchAllAsMap();
 
