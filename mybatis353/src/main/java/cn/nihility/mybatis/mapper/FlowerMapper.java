@@ -43,4 +43,13 @@ public interface FlowerMapper {
 
   Integer insertNoAutoGenerateId(Flower entity);
 
+  /* mybatis 插入性能对比 */
+  Integer insertFlowerEntity(Flower flower);
+
+  Integer insertFlowerList(@Param("flowerList") List<Flower> flowerList);
+
+
+  List<Flower> selectFlowerFetchSize();
+
+
 }

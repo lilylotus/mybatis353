@@ -31,19 +31,21 @@
       <result property="updateTime" column="partner_update_time"/>
     </association>-->
     <collection property="flowers" ofType="flower">
-      <id property="id" column="flower_id"/>
-      <result property="nameChinese" column="flower_name_chinese"/>
-      <result property="nameEnglish" column="flower_name_english"/>
-      <result property="age" column="flower_age"/>
+      <id property="id" column="flower_id" jdbcType="VARCHAR"/>
+      <result property="nameChinese" column="flower_name_chinese" jdbcType="VARCHAR"/>
+      <result property="nameEnglish" column="flower_name_english" jdbcType="VARCHAR"/>
+      <result property="age" column="flower_age" jdbcType="INTEGER"/>
       <result property="addTime" column="flower_add_time"/>
       <result property="updateTime" column="flower_update_time"/>
     </collection>
   </resultMap>
 
+  <!-- #{property,javaType=int,jdbcType=NUMERIC,typeHandler=MyTypeHandler} -->
+
   <select id="selectGardenerByIdWithResultMapSelect" resultMap="innerResultMapSelect">
     SELECT gd.id, gd.name, gd.age, gd.add_time, gd.update_time
     FROM gardener gd
-    WHERE gd.id = #{id}
+    WHERE gd.id = #{id,jdbcType=VARCHAR}
   </select>
 
   <select id="selectGardenerByIdWithResultMap" resultMap="innerResultMap">
@@ -155,5 +157,24 @@
     FROM flower
     WHERE id = #{id}
   </delete>
+
+  <!-- mybatis 批量插入对比 -->
+  <insert id="insertFlowerEntity" parameterType="flower">
+    INSERT INTO flower (id, name_english, name_chinese, age, add_time, update_time)
+    VALUES (#{id}, #{nameEnglish}, #{nameChinese}, #{age}, #{addTime}, #{updateTime})
+  </insert>
+
+  <insert id="insertFlowerList" parameterType="java.util.List">
+    INSERT INTO flower (id, name_english, name_chinese, age, add_time, update_time)
+    VALUES
+      <foreach collection="flowerList" index="index" item="item" separator=",">
+        (#{item.id}, #{item.nameEnglish}, #{item.nameChinese}, #{item.age}, #{item.addTime}, #{item.updateTime})
+      </foreach>
+  </insert>
+
+  <select id="selectFlowerFetchSize" resultType="flower" fetchSize="10">
+    SELECT id, name_english, name_chinese, age, add_time, update_time
+    FROM flower
+  </select>
 
 </mapper>

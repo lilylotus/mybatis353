@@ -41,9 +41,11 @@ public class ParameterExpression extends HashMap<String, String> {
 
   private void parse(String expression) {
     int p = skipWS(expression, 0);
+    // 这是一个表达式
     if (expression.charAt(p) == '(') {
       expression(expression, p + 1);
     } else {
+      // 属性
       property(expression, p);
     }
   }
@@ -65,14 +67,17 @@ public class ParameterExpression extends HashMap<String, String> {
 
   private void property(String expression, int left) {
     if (left < expression.length()) {
+      // 跳过属性分隔符, name:
       int right = skipUntil(expression, left, ",:");
       put("property", trimmedStr(expression, left, right));
+      // 可选的 javaType,jdbcType,typeHandler
       jdbcTypeOpt(expression, right);
     }
   }
 
   private int skipWS(String expression, int p) {
     for (int i = p; i < expression.length(); i++) {
+      // 0x20 是 ASCII 中的空格
       if (expression.charAt(i) > 0x20) {
         return i;
       }
@@ -93,6 +98,7 @@ public class ParameterExpression extends HashMap<String, String> {
   private void jdbcTypeOpt(String expression, int p) {
     p = skipWS(expression, p);
     if (p < expression.length()) {
+      // javaType 分隔
       if (expression.charAt(p) == ':') {
         jdbcType(expression, p + 1);
       } else if (expression.charAt(p) == ',') {
@@ -117,6 +123,7 @@ public class ParameterExpression extends HashMap<String, String> {
   private void option(String expression, int p) {
     int left = skipWS(expression, p);
     if (left < expression.length()) {
+      // #{id,jdbcType=VARCHAR}，属性值分隔
       int right = skipUntil(expression, left, "=");
       String name = trimmedStr(expression, left, right);
       left = right + 1;

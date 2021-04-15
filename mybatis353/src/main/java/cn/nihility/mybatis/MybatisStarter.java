@@ -10,25 +10,42 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 public class MybatisStarter {
 
   private static final String FLOWER_ID = "00009";
   private static final String MYBATIS_CONFIG_LOCATION = "mybatis/mybatis-config.xml";
 
+  private static SqlSessionFactory buildSqlSessionFactory() throws IOException {
+    return new SqlSessionFactoryBuilder().build(Resources.getResourceAsReader(MYBATIS_CONFIG_LOCATION));
+  }
+
   public static void main(String[] args) throws IOException {
-    SqlSessionFactory sqlSessionFactory =
-      new SqlSessionFactoryBuilder().build(Resources.getResourceAsReader(MYBATIS_CONFIG_LOCATION));
+    SqlSessionFactory sqlSessionFactory = buildSqlSessionFactory();
 
     try (SqlSession session = sqlSessionFactory.openSession()) {
 
       final FlowerMapper mapper = session.getMapper(FlowerMapper.class);
 
-      final Flower flower = new Flower("auto", "auto", 20);
+      Map<String, Object> map = mapper.searchAllAsMap();
+      map.forEach((k, v) -> System.out.println(k + " : " + v));
+
+      List<Flower> flowerList = mapper.searchLikeEnglishName2("o");
+      flowerList.forEach(System.out::println);
+
+      flowerList = mapper.searchLikeEnglishName("o");
+      flowerList.forEach(System.out::println);
+
+      Integer updateCnt = mapper.updateNameById("00001", "百合new");
+      System.out.println("update cnt [" + updateCnt + "]");
+      session.commit();
+
+      /*final Flower flower = new Flower("auto", "auto", 20);
       final Integer integer = mapper.insertNoAutoGenerateId(flower);
       session.commit();
       System.out.println(flower);
-      System.out.println(integer);
+      System.out.println(integer);*/
 
       /*final AutoIncrementEntity entity = new AutoIncrementEntity("自增");
       final Integer resultEntity = mapper.insertMysqlAutoGenerateId(entity);
@@ -46,21 +63,21 @@ public class MybatisStarter {
 
   }
 
-    public static void main1(String[] args) throws IOException {
-        String mybatisConfigLocation = "mybatis/mybatis-config.xml";
+  public static void main1(String[] args) throws IOException {
+    String mybatisConfigLocation = "mybatis/mybatis-config.xml";
 
-        InputStream inputStream = Resources.getResourceAsStream(mybatisConfigLocation);
-        SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+    InputStream inputStream = Resources.getResourceAsStream(mybatisConfigLocation);
+    SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 
-        try (SqlSession session = sessionFactory.openSession()) {
-            FlowerMapper mapper = session.getMapper(FlowerMapper.class);
-            // FlowerMapper2 mapper2 = session.getMapper(FlowerMapper2.class);
+    try (SqlSession session = sessionFactory.openSession()) {
+      FlowerMapper mapper = session.getMapper(FlowerMapper.class);
+      // FlowerMapper2 mapper2 = session.getMapper(FlowerMapper2.class);
 
-            //insertAndDelete(mapper, session);
+      //insertAndDelete(mapper, session);
 
-            List<Flower> gardenItemList = mapper.searchAll();
-            System.out.println(gardenItemList);
-            session.commit();
+      List<Flower> gardenItemList = mapper.searchAll();
+      System.out.println(gardenItemList);
+      session.commit();
 
           /*Map<String, Object> flowerMap = mapper.searchByIdAsMap(FLOWER_ID);
           System.out.println(flowerMap);
@@ -89,34 +106,34 @@ public class MybatisStarter {
             session.commit();
             System.out.println(mapper.searchById(FLOWER_ID));*/
 
-        }
     }
+  }
 
-    private static void insertAndDelete(FlowerMapper mapper, SqlSession session) {
+  private static void insertAndDelete(FlowerMapper mapper, SqlSession session) {
 
-        Flower flower = generateFlower();
-        mapper.insertByEntity(flower);
-        session.commit();
-        System.out.println(mapper.searchById(FLOWER_ID));
+    Flower flower = generateFlower();
+    mapper.insertByEntity(flower);
+    session.commit();
+    System.out.println(mapper.searchById(FLOWER_ID));
 
-        flower.setNameChinese("修改值");
-        mapper.updateByEntity(flower);
-        session.commit();
+    flower.setNameChinese("修改值");
+    mapper.updateByEntity(flower);
+    session.commit();
 
-        mapper.updateColumnById(FLOWER_ID, "name_chinese", "change值");
-        session.commit();
+    mapper.updateColumnById(FLOWER_ID, "name_chinese", "change值");
+    session.commit();
 
-        System.out.println("-------------------------------");
-        System.out.println(mapper.deleteById(FLOWER_ID));
-        session.commit();
-    }
+    System.out.println("-------------------------------");
+    System.out.println(mapper.deleteById(FLOWER_ID));
+    session.commit();
+  }
 
-    private static Flower generateUpdateFlower() {
-        return new Flower(FLOWER_ID, null, "水仙花-新品种", 100);
-    }
+  private static Flower generateUpdateFlower() {
+    return new Flower(FLOWER_ID, null, "水仙花-新品种", 100);
+  }
 
-    private static Flower generateFlower() {
-        return new Flower(FLOWER_ID, "daffodil", "水仙花", 8);
-    }
+  private static Flower generateFlower() {
+    return new Flower(FLOWER_ID, "daffodil", "水仙花", 8);
+  }
 
 }

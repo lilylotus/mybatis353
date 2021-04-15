@@ -89,6 +89,7 @@ public class SimpleExecutor extends BaseExecutor {
     Statement stmt;
     Connection connection = getConnection(statementLog);
     // org.apache.ibatis.executor.statement.RoutingStatementHandler
+    // 这里是插件 (plugin) StatementHandler 的执行点
     stmt = handler.prepare(connection, transaction.getTimeout());
     // 配置参数， prepareStatement.setObject(1, id, Types.VARCHAR);
     handler.parameterize(stmt);

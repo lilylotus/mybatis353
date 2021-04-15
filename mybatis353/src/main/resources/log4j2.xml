@@ -26,7 +26,7 @@
     <!-- Logger 节点用来单独指定日志的形式，比如要为指定包下的 class 指定不同的日志级别等 -->
     <!-- 定义 logger，只有定义了 logger 并引入 appender，appender 才会生效-->
     <Loggers>
-        <Root level="ALL">
+        <Root level="INFO">
             <!--<appender-ref ref="Console"/>-->
             <AppenderRef ref="Console"/>
         </Root>
