@@ -4,9 +4,16 @@ import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.transaction.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +30,12 @@ import java.util.Properties;
  *    {@link org.apache.ibatis.executor.resultset.DefaultResultSetHandler}
  * - {@link StatementHandler} (prepare, parameterize, batch, update, query)
  *    {@link org.apache.ibatis.executor.statement.RoutingStatementHandler}
+ *
+ * mybatis plugin 拦截处理
+ * @see Configuration#newExecutor(Transaction, ExecutorType)
+ * @see Configuration#newParameterHandler(MappedStatement, Object, BoundSql)
+ * @see Configuration#newResultSetHandler(Executor, MappedStatement, RowBounds, ParameterHandler, ResultHandler, BoundSql)
+ * @see Configuration#newStatementHandler(Executor, MappedStatement, Object, RowBounds, ResultHandler, BoundSql)
  *
  */
 @Intercepts({
