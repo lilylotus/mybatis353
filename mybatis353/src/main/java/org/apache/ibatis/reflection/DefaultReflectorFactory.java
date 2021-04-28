@@ -39,6 +39,7 @@ public class DefaultReflectorFactory implements ReflectorFactory {
   public Reflector findForClass(Class<?> type) {
     if (classCacheEnabled) {
       // synchronized (type) removed see issue #461
+      // 注意：这里 JDK1.8 ConcurrentHashMap 可能会有多线程并发性能问题，多线程阻塞
       return reflectorMap.computeIfAbsent(type, Reflector::new);
     } else {
       return new Reflector(type);

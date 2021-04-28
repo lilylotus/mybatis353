@@ -131,6 +131,7 @@ public class MybatisAutoConfiguration implements InitializingBean {
   @Bean
   @ConditionalOnMissingBean
   public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+    // FactoryBean 接口的实现
     SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
     factory.setDataSource(dataSource);
     factory.setVfs(SpringBootVFS.class);
