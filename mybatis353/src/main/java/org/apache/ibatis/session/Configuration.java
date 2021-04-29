@@ -94,11 +94,15 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeAliasRegistry;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Clinton Begin
  */
 public class Configuration {
+
+  private final static Logger log = LoggerFactory.getLogger(Configuration.class);
 
   protected Environment environment;
 
@@ -577,6 +581,9 @@ public class Configuration {
 
   public ParameterHandler newParameterHandler(MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
     ParameterHandler parameterHandler = mappedStatement.getLang().createParameterHandler(mappedStatement, parameterObject, boundSql);
+    if (log.isDebugEnabled()) {
+      log.debug("newParameterHandler intercept plugin, resource [{}]", mappedStatement.getResource());
+    }
     // 把所有的插件封装 (wrapper) 到 ParameterHandler，代理的 target 对象
     parameterHandler = (ParameterHandler) interceptorChain.pluginAll(parameterHandler);
     return parameterHandler;
@@ -585,6 +592,9 @@ public class Configuration {
   public ResultSetHandler newResultSetHandler(Executor executor, MappedStatement mappedStatement, RowBounds rowBounds, ParameterHandler parameterHandler,
       ResultHandler resultHandler, BoundSql boundSql) {
     ResultSetHandler resultSetHandler = new DefaultResultSetHandler(executor, mappedStatement, parameterHandler, resultHandler, boundSql, rowBounds);
+    if (log.isDebugEnabled()) {
+      log.debug("newResultSetHandler intercept plugin, resource [{}]", mappedStatement.getResource());
+    }
     // 把所有的插件封装 (wrapper) 到 ResultSetHandler，代理的 target 对象
     resultSetHandler = (ResultSetHandler) interceptorChain.pluginAll(resultSetHandler);
     return resultSetHandler;
@@ -592,6 +602,9 @@ public class Configuration {
 
   public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
     StatementHandler statementHandler = new RoutingStatementHandler(executor, mappedStatement, parameterObject, rowBounds, resultHandler, boundSql);
+    if (log.isDebugEnabled()) {
+      log.debug("newStatementHandler intercept plugin, resource [{}]", mappedStatement.getResource());
+    }
     // 把所有的插件封装 (wrapper) 到 statementHandler，代理的 target 对象
     statementHandler = (StatementHandler) interceptorChain.pluginAll(statementHandler);
     return statementHandler;
@@ -619,6 +632,9 @@ public class Configuration {
     // 是否允许缓存，一级缓存 ???
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
+    }
+    if (log.isDebugEnabled()) {
+      log.debug("newExecutor intercept plugin, executorType [{}]", executorType);
     }
     // 拦截器链，添加 JDK 动态代理插件
     executor = (Executor) interceptorChain.pluginAll(executor);

@@ -21,6 +21,12 @@ import java.sql.Connection;
 import java.util.Properties;
 
 /**
+ * 默认拦截器拦截顺序
+ * 1. Executor
+ * 2. ParameterHandler
+ * 3. StatementHandler
+ * 4. ResultSetHandler
+ *
  * 支持的拦截类和方法
  * - {@link Executor} (update, query, flushStatements, commit, rollback, getTransaction, close, isClosed)
  *    {@link org.apache.ibatis.executor.CachingExecutor}

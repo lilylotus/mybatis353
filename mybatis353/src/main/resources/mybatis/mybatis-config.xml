@@ -28,6 +28,13 @@
     </plugin>
   </plugins>-->
 
+  <plugins>
+    <plugin interceptor="cn.nihility.mybatis.intercept.MyExecutorInterceptPlugin"/>
+    <plugin interceptor="cn.nihility.mybatis.intercept.MyParameterHandlerInterceptPlugin"/>
+    <plugin interceptor="cn.nihility.mybatis.intercept.MyResultSetHandlerInterceptPlugin"/>
+    <plugin interceptor="cn.nihility.mybatis.intercept.MyStatementHandlerInterceptPlugin"/>
+  </plugins>
+
   <environments default="development">
     <environment id="development">
       <transactionManager type="JDBC"/>

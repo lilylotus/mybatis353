@@ -28,18 +28,18 @@ public class MybatisStarter {
 
       final FlowerMapper mapper = session.getMapper(FlowerMapper.class);
 
-      Map<String, Object> map = mapper.searchAllAsMap();
-      map.forEach((k, v) -> System.out.println(k + " : " + v));
+      /*Map<String, Object> map = mapper.searchAllAsMap();
+      map.forEach((k, v) -> System.out.println(k + " : " + v));*/
 
-      List<Flower> flowerList = mapper.searchLikeEnglishName2("o");
+      List<Flower> flowerList = mapper.searchLikeEnglishName2("lily");
       flowerList.forEach(System.out::println);
 
-      flowerList = mapper.searchLikeEnglishName("o");
-      flowerList.forEach(System.out::println);
+      /*flowerList = mapper.searchLikeEnglishName("o");
+      flowerList.forEach(System.out::println);*/
 
-      Integer updateCnt = mapper.updateNameById("00001", "百合new");
+      /*Integer updateCnt = mapper.updateNameById("00001", "百合new");
       System.out.println("update cnt [" + updateCnt + "]");
-      session.commit();
+      session.commit();*/
 
       /*final Flower flower = new Flower("auto", "auto", 20);
       final Integer integer = mapper.insertNoAutoGenerateId(flower);
