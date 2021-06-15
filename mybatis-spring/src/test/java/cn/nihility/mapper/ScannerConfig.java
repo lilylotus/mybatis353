@@ -23,7 +23,7 @@ import java.util.Set;
 @Import(ScannerConfig.class)
 public class ScannerConfig implements ApplicationContextAware, ImportBeanDefinitionRegistrar {
 
-  private final static Logger log = LoggerFactory.getLogger(ScannerConfig.class);
+  private static final Logger log = LoggerFactory.getLogger(ScannerConfig.class);
   private ApplicationContext applicationContext;
 
   @Override
@@ -74,7 +74,7 @@ public class ScannerConfig implements ApplicationContextAware, ImportBeanDefinit
   }
 
   static class BeanDefinitionRegistryPostProcessorImpl implements BeanDefinitionRegistryPostProcessor {
-    private final static Logger log = LoggerFactory.getLogger(BeanDefinitionRegistryPostProcessorImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(BeanDefinitionRegistryPostProcessorImpl.class);
 
     private String tag;
 

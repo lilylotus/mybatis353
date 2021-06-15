@@ -102,7 +102,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Configuration {
 
-  private final static Logger log = LoggerFactory.getLogger(Configuration.class);
+  private static final Logger log = LoggerFactory.getLogger(Configuration.class);
 
   protected Environment environment;
 

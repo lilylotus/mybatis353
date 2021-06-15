@@ -50,6 +50,10 @@
   <mappers>
     <mapper resource="mybatis/mapper/FlowerMapper.xml"/>
     <mapper resource="mybatis/mapper/FlowerMapper2.xml"/>
+    <mapper resource="mybatis/mapper/DuplicateMapper.xml"/>
+    <!--<mapper class="cn.nihility.mybatis.mapper.DuplicateMapper"/>-->
+    <!--<mapper class="cn.nihility.mybatis.mapper.FlowerMapper" />-->
+    <!--<mapper url="" />-->
   </mappers>
 
 </configuration>

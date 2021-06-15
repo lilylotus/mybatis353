@@ -14,7 +14,7 @@ import java.util.Properties;
 })
 public class MyParameterHandlerInterceptPlugin implements Interceptor {
 
-  private final static Logger log = LoggerFactory.getLogger(MyParameterHandlerInterceptPlugin.class);
+  private static final Logger log = LoggerFactory.getLogger(MyParameterHandlerInterceptPlugin.class);
 
   @Override
   public Object intercept(Invocation invocation) throws Throwable {

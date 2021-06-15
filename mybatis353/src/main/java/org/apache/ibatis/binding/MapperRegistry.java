@@ -59,6 +59,7 @@ public class MapperRegistry {
 
   public <T> void addMapper(Class<T> type) {
     if (type.isInterface()) {
+      // 接口/ xml 的 mapper 仅能存在一个。
       if (hasMapper(type)) {
         throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
       }
@@ -66,6 +67,8 @@ public class MapperRegistry {
       try {
         // 对应 mapper 接口的代理工厂类，为后面 sqlSession.getMapper(class) 做准备
         // mapper.xml 中 namespace 对应的接口对象
+        // 注意：是先加载 xml 配置在处理 xml namespace 定义接口 (默认)
+        // 加载 xml mapper 配置时会默认处理 namespace 对应的接口中的方法
         knownMappers.put(type, new MapperProxyFactory<>(type));
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the

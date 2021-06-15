@@ -15,7 +15,7 @@ import java.sql.Statement;
 })
 public class MyResultSetHandlerInterceptPlugin implements Interceptor {
 
-  private final static Logger log = LoggerFactory.getLogger(MyResultSetHandlerInterceptPlugin.class);
+  private static final Logger log = LoggerFactory.getLogger(MyResultSetHandlerInterceptPlugin.class);
 
   @Override
   public Object intercept(Invocation invocation) throws Throwable {

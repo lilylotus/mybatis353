@@ -298,6 +298,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
     /* 把配置好的 mapper.xml SQL 配置段 / mapper 对应接口 的方法，作为一个 SQL Statement 添加到 Configuration
     * 后面： org.apache.ibatis.binding.MapperMethod.SqlCommand.resolveMappedStatement
     * 拿出该 statement 对象
+    * StrictMap -> 接口/xml 的 mapper 中定义 接口.方法 仅能有一个。
     * */
     configuration.addMappedStatement(statement);
     return statement;

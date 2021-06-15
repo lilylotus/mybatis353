@@ -18,7 +18,7 @@ import java.util.UUID;
 public class BatchInsertTest {
 
   private static SqlSessionFactory sqlSessionFactory;
-  private final static int LOOP_COUNT = 10000;
+  private static final int LOOP_COUNT = 10000;
 
   @BeforeAll
   public static void initSqlSessionFactory() {
