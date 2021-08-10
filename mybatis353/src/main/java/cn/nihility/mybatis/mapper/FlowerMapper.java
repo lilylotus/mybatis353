@@ -13,6 +13,8 @@ public interface FlowerMapper {
 
   Flower searchById(String id);
 
+  Flower searchFlowerTypeHandlerById(String id);
+
   @MapKey("id")
   Map<String, Object> searchByIdAsMap(String id);
 
@@ -26,6 +28,8 @@ public interface FlowerMapper {
   Map<String, Object> searchAllAsMap();
 
   Integer insertByEntity(Flower flower);
+
+  Integer insertTypeHandlerByEntity(Flower flower);
 
   Integer updateByEntity(Flower flower);
 

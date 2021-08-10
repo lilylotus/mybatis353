@@ -22,6 +22,10 @@
     <package name="cn.nihility.mybatis.entity"/>
   </typeAliases>
 
+  <!--<typeHandlers>
+    <typeHandler handler="cn.nihility.mybatis.type.MillisDateTimeTypeHandler"/>
+  </typeHandlers>-->
+
   <!--<plugins>
     <plugin interceptor="cn.nihility.mybatis.intercept.StatementInterceptPlugin">
       <property name="pluginProperty" value="100"/>

@@ -9,6 +9,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class MybatisStarter {
@@ -27,11 +28,20 @@ public class MybatisStarter {
 
       final FlowerMapper mapper = session.getMapper(FlowerMapper.class);
 
+      final Flower fw = new Flower("202108100001", "typeHandler", "类型处理", 20);
+      fw.setMillisTime(LocalDateTime.now());
+      final Integer integer = mapper.insertTypeHandlerByEntity(fw);
+      System.out.println(integer);
+      session.commit();
+
+      final Flower flower = mapper.searchFlowerTypeHandlerById("202108100001");
+      System.out.println(flower);
+
       /*Map<String, Object> map = mapper.searchAllAsMap();
       map.forEach((k, v) -> System.out.println(k + " : " + v));*/
 
-      List<Flower> flowerList = mapper.searchLikeEnglishName2("lily");
-      flowerList.forEach(System.out::println);
+      /*List<Flower> flowerList = mapper.searchLikeEnglishName2("lily");
+      flowerList.forEach(System.out::println);*/
 
       /*flowerList = mapper.searchLikeEnglishName("o");
       flowerList.forEach(System.out::println);*/

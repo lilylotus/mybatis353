@@ -10,6 +10,7 @@ public class Flower {
     private Integer age;
     private LocalDateTime addTime = LocalDateTime.now();
     private LocalDateTime updateTime = LocalDateTime.now();
+    private LocalDateTime millisTime = LocalDateTime.now();
 
     public Flower() {
     }
@@ -84,6 +85,14 @@ public class Flower {
     this.updateTime = updateTime;
   }
 
+  public LocalDateTime getMillisTime() {
+    return millisTime;
+  }
+
+  public void setMillisTime(LocalDateTime millisTime) {
+    this.millisTime = millisTime;
+  }
+
   @Override
   public String toString() {
     return "Flower{" +
@@ -93,6 +102,8 @@ public class Flower {
       ", age=" + age +
       ", addTime=" + addTime +
       ", updateTime=" + updateTime +
+      ", millisTime=" + millisTime +
       '}';
   }
+
 }

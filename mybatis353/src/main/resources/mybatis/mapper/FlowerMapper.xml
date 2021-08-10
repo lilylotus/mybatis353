@@ -40,6 +40,17 @@
     </collection>
   </resultMap>
 
+  <resultMap id="flowerTypeHandlerMap" type="flower">
+    <!--id, name_english, name_chinese, age, add_time, update_time, millis-->
+    <id property="id" column="id" jdbcType="VARCHAR"/>
+    <result property="nameChinese" column="name_chinese" jdbcType="VARCHAR"/>
+    <result property="nameEnglish" column="name_english" jdbcType="VARCHAR"/>
+    <result property="age" column="age" jdbcType="INTEGER"/>
+    <result property="addTime" column="add_time"/>
+    <result property="updateTime" column="update_time"/>
+    <result property="millisTime" column="millis" typeHandler="cn.nihility.mybatis.type.MillisDateTimeTypeHandler"/>
+  </resultMap>
+
   <!-- #{property,javaType=int,jdbcType=NUMERIC,typeHandler=MyTypeHandler} -->
 
   <select id="selectGardenerByIdWithResultMapSelect" resultMap="innerResultMapSelect">
@@ -71,6 +82,12 @@
 
   <select id="searchById" resultType="flower" parameterType="string">
     SELECT id, name_english, name_chinese, age, add_time, update_time
+    FROM flower
+    WHERE id = #{id}
+  </select>
+
+  <select id="searchFlowerTypeHandlerById" resultMap="flowerTypeHandlerMap" parameterType="string">
+    SELECT id, name_english, name_chinese, age, add_time, update_time, millis
     FROM flower
     WHERE id = #{id}
   </select>
@@ -121,6 +138,11 @@
   <insert id="insertByEntity" parameterType="flower">
     INSERT INTO flower (id, name_english, name_chinese, age, add_time, update_time)
     VALUES (#{id}, #{nameEnglish}, #{nameChinese}, #{age}, now(), now())
+  </insert>
+
+  <insert id="insertTypeHandlerByEntity" parameterType="flower">
+    INSERT INTO flower (id, name_english, name_chinese, age, add_time, update_time, millis)
+    VALUES (#{id}, #{nameEnglish}, #{nameChinese}, #{age}, now(), now(), #{millisTime, typeHandler=cn.nihility.mybatis.type.MillisDateTimeTypeHandler})
   </insert>
 
   <update id="updateByEntity" parameterType="flower">
